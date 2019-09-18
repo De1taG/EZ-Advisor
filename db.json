@@ -1,8 +1,10 @@
 {
-  "posts": [
+  "Class": [
     {
       "id": 1,
-      "title": "hello"
+      "title": "Computer Science I"
+      "code": "CS200"
+      "instructor": "Someone"
     }
   ],
   "profile": {
