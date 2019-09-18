@@ -2,8 +2,8 @@
   "Class": [
     {
       "id": 1,
-      "title": "Computer Science I"
-      "code": "CS200"
+      "title": "Computer Science I",
+      "code": "CS200",
       "instructor": "Someone"
     }
   ],
