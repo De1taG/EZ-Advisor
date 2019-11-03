@@ -19,7 +19,8 @@ Student side:
 
 Advisor side:
 1. index.html
-2. approve-schedules.html
+2. get-started.html
+3. approve-schedules.html
 3. review-schedule-advisor-view.html
 
 *Advisor is directed to login.html only if they select the 'Logout' in the navigation menu
