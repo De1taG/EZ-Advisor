@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400&display=swap" rel="stylesheet">
     <script src="https://kit.fontawesome.com/816cd9bf52.js" crossorigin="anonymous"></script>
   </head>
+  
   <body>
 
     <!--Navbar start--> 
@@ -31,7 +32,7 @@
         </ul>
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
-            <a class="nav-link" href="#">View Messages</a>
+            <a class="nav-link" href="advisor-info.html">Advisor Information</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="login.html">Logout</a>
@@ -47,10 +48,10 @@
       
       <!--Select term start-->
       <!--Currently this page contains static hard-coded term options.-->
-      <!--Ideally this page would be dynamic so that the first option would always be the 'current' semester and the second option would be the 'following' semester.-->
+      <!--Ideally this page would be dynamic so that the first option would always be the 'next' semester and the second option would be the 'following' semester.-->
       <div class="container-fluid">
-        <div class="row align-items-center">
-          <div class="col-8 col-sm-7 col-md-6 col-lg-5 col-xl-4">
+        <div class="row">
+          <div class="col">
             <a href="select-campus.html" class="btn back-button" role="button">BACK</a>
           </div>
         </div>
@@ -59,12 +60,12 @@
               <h1 id="select-term-header" class="page-header mt-0">Select term</h1>
           </div>
         </div>
-        <div class="row h-50 align-items-center">
-          <div class="col-7 col-sm-6 col-md-5 col-lg-4 col-xl-3 mx-auto text-center">
-            <a href="/select-subject.html" class="btn btn-block select-term-button" role="button">FALL 2019</a>
-          </div>
+        <div class="row">
           <div class="col-7 col-sm-6 col-md-5 col-lg-4 col-xl-3 mx-auto text-center">
             <a href="/select-subject.html" class="btn btn-block select-term-button" role="button">SPRING 2020</a>
+          </div>
+          <div class="col-7 col-sm-6 col-md-5 col-lg-4 col-xl-3 mx-auto text-center">
+            <a href="/select-subject.html" class="btn btn-block select-term-button" role="button">SUMMER 2020</a>
           </div>
         </div>
       </div>

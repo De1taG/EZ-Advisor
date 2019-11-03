@@ -44,7 +44,16 @@ body {
     background-color: white;
     margin-top: 1em;
     color: #07CB8B;
+    width: 100px;
 }
+
+.back-button:hover {
+    background-color: #07CB8B;
+    color: white;
+}
+
+
+
 
 .page-header {
     color: white;
@@ -458,7 +467,7 @@ html.is-leaving .transition-fade {
 
 .review-schedule-button {
     background-color: white;
-    color: #545353;
+    color: #07CB8B;
     font-size: 22px;
     width: 80%;
     margin-bottom: 2em;
@@ -488,6 +497,62 @@ hr {
 /*-------------------------------------------------------*/
 
 
+/*------------APPROVE-SCHEDULES.HTML------------------------*/
+.approve-schedules-header {
+    font-size: 14px;
+}
+
+.student-info {
+    font-size: 14px;
+}
+/*-------------------------------------------------------*/
+
+
+/*------------REVIEW-SCHEDULE-ADVISOR-VIEW.HTML------------------------*/
+
+#feedback-modal-footer {
+    justify-content: space-around;
+}
+
+.feedback-modal-button {
+    background-color: #07CB8B;
+    color: white;
+    width: 30%;
+    height: 60%;
+}
+
+.feedback-modal-button:hover {
+    background-color: white;
+    color: #07CB8B;
+}
+
+#schedule-approved-modal-body, #feedback-sent-modal-body {
+    text-align: center;
+}
+/*-------------------------------------------------------*/
+
+
+/*------------ADVISOR-INFO.HTML--------------------*/
+#advisor-info {
+    border: 2px solid black;
+    border-radius: 0.5rem;
+    color: #545353;
+    background-color: white;
+}
+
+#advisor-info-content {
+    line-height: 3;
+}
+
+#advisor-email, #advisor-phone {
+    color: inherit;
+}
+/*-------------------------------------------------------*/
+
+
+
+
+
 @media (min-width: 576px) { 
     .select-course-button {
         font-size: 16px;
@@ -504,6 +569,15 @@ hr {
     .input-login::placeholder {
         font-size: 14px;
     }
+
+    .approve-schedules-header {
+        font-size: 16px;
+    }
+
+    .student-info {
+        font-size: 16px;
+    }
+
 }
 
 @media (min-width: 768px) { 
@@ -513,6 +587,10 @@ hr {
 
     .input-login::placeholder {
         font-size: 16px;
+    }
+
+    .approve-schedules-header {
+        font-size: 18px;
     }
 }
 

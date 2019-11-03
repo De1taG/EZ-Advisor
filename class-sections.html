@@ -10,7 +10,7 @@
     <link rel="stylesheet" type = "text/css" href="css/main.css">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400&display=swap" rel="stylesheet">
   </head>
-
+  
   <body>
 
     <!--Navbar start-->
@@ -31,7 +31,7 @@
         </ul>
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-              <a class="nav-link" href="#">View Messages</a>
+              <a class="nav-link" href="advisor-info.html">Advisor Information</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="login.html">Logout</a>
@@ -177,41 +177,24 @@
       </div>
       <!--modal end-->
 
-      <!--Modal class successfully added start-->
+      <!--Modal class added OR not added start-->
       <!--This modal dialog appears after the student selects to add the course to their schedule.-->
+      <!--The message displayed is either a success message or error message. If the student has already added the course to their schedule, display an error message. Else, display a success message-->
       <div class="modal fade" id="classAddedModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div id="class-sections-modal-content" class="modal-content">
             <div id="class-sections-modal-body" class="modal-body">
               <p id="class-sections-modal-text">
-              Course successfully added!
+              Course successfully added! or Error adding course. <!--Needs to be dynamic-->
               </p>
             </div>
             <div id="class-sections-modal-footer" class="modal-footer">
-              <button type="button" id="success-modal-button-close" class="btn class-sections-modal-button" data-dismiss="modal">Close</button>
+              <button type="button" id="class-added-modal-button-close" class="btn class-sections-modal-button" data-dismiss="modal">Close</button>
             </div>
           </div>
         </div>
       </div>
-      <!--Modal class successfully added end-->
-
-      <!--Modal error adding course start.-->
-      <!--This modal dialog would appear if the student has already added this course to their schedule. Therefore, the system needs to know if the student has already added this course to their schedule-->
-      <div class="modal fade" id="ErrorModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div id="class-sections-modal-content" class="modal-content">
-            <div id="class-sections-modal-body" class="modal-body">
-              <p id="class-sections-modal-text">
-              Error adding course.
-              </p>
-            </div>
-            <div id="class-sections-modal-footer" class="modal-footer">
-              <button type="button" id="error-modal-button-close" class="btn class-sections-modal-button" data-dismiss="modal">Close</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!--Modal error adding course end-->
+      <!--Modal class added OR not added end-->
 
     </main>
     <!--Swup end-->
@@ -224,17 +207,6 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <script src="node_modules/swup/dist/swup.min.js"></script>
     <script src="script.js"></script>
-    <script type="text/javascript">
-      $(function(){ 
-        $('#class-info-modal-button-add').click(function() {
-          $('#successAlert').show('fade');
-        });
-
-        $('#linkClose').click(function() {
-          $('#successAlert').hide('fade');
-        })
-      });
-    </script>
 
   </body>
 </html>
