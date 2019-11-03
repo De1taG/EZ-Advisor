@@ -1,5 +1,7 @@
 The progression of the pages is as follows:
 
+
+Student side:
 1. index.html
 2. get-started.html
 3. build-schedule.html
@@ -12,4 +14,12 @@ The progression of the pages is as follows:
 
 * Student is directed to login.html only if they select the 'Logout' in the navigation menu
 * Student is directed to review-schedule.html only if they select 'Review Schedule' in the navigation menu
+* Student is directed to advisor-info.html only if they select 'Advisor Information' in the navigation menu
 
+
+Advisor side:
+1. index.html
+2. approve-schedules.html
+3. review-schedule-advisor-view.html
+
+*Advisor is directed to login.html only if they select the 'Logout' in the navigation menu
