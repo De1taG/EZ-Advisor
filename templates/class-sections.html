@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>EZ Advisor</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" type = "text/css" href="css/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400&display=swap" rel="stylesheet">
+  </head>
+  
+  <body>
+
+    <!--Navbar start-->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light"> 
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <!--Right now the logo in the navbar links page to index.html but this may not be the best design choice. Should the logo even be a link? We don't really have a home page. It's more for convenience at this stage.-->
+      <a href="index.html"><img class="navbar-brand" src="images/ez_trimmed.png"></a>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="build-schedule.html">Plan Schedule</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="review-schedule.html">Review Schedule</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="advisor-info.html">Advisor Information</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="login.html">Logout</a>
+            </li>
+          </ul>
+      </div>
+    </nav>
+    <!--Navbar end-->
+
+    <!--Swup start-->
+    <!--Swup is the JavaScript library we are using for page transitions-->
+    <main id="swup" class="transition-fade">
+
+      <!--Class sections start-->
+      <!--This section currently contains static hard-coded data.-->
+      <!--The data in this section needs to be dynamic and reflect whichever course the student selected on the previous page.-->
+      <div id="class-sections-container" class="container-fluid">
+        <div class="row">
+          <div class="col-11 col-sm-10 col-md-9 col-lg-8 col-xl-7 mx-auto text-center">
+            <div class="row">
+              <div class="col">
+                <h1 id="select-class-section-header" class="page-header">CSCI U150<br>Introduction to<br>Computer Science</h1> <!--Needs to be dynamic/pulled from database-->
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <h5 class="course-details-header">CRN</h5><!--This does not need to be dynamic-->
+              </div>
+              <div class="col">
+                <h5 class="course-details-header">Sect</h5><!--This does not need to be dynamic-->
+              </div>
+              <div class="col">
+                <h5 class="course-details-header">Instructor</h5><!--This does not need to be dynamic-->
+              </div>
+              <div class="col">
+                <h5 class="course-details-header">Days</h5><!--This does not need to be dynamic-->
+              </div>
+              <div class="col">
+                <h5 class="course-details-header">Time</h5><!--This does not need to be dynamic-->
+              </div>
+                <div class="col">
+                <h5 class="course-details-header">Availability</h5><!--This does not need to be dynamic-->
+              </div>
+            </div>
+            <div class="row class-section-row">
+              <div class="col">
+                <a href="#" class="btn btn-block select-class-section-button" role="button" data-toggle="modal" data-target="#classInfoModal">
+                  <div class="row">
+                    <div class="col">
+                      27469 <!--Needs to be dynamic/pulled from database-->
+                    </div>
+                    <div class="col">
+                      01 <!--Needs to be dynamic/pulled from database-->
+                    </div>
+                    <div class="col">
+                      Hansen, Keith <!--Needs to be dynamic/pulled from database-->
+                    </div>
+                    <div class="col">
+                      MWF <!--Needs to be dynamic/pulled from database-->
+                    </div>
+                    <div class="col">
+                      8:30am-9:20am <!--Needs to be dynamic/pulled from database-->
+                    </div>
+                    <div class="col">
+                      12 of 24 <!--Needs to be dynamic/pulled from database-->
+                    </div>
+                  </div>
+                </a>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <a href="#" class="btn btn-block select-class-section-button" role="button"></a>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <a href="#" class="btn btn-block select-class-section-button" role="button"></a>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <a href="#" class="btn btn-block select-class-section-button" role="button"></a>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <a href="#" class="btn btn-block select-class-section-button" role="button"></a>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <a href="#" class="btn btn-block select-class-section-button" role="button"></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--Class sections end-->
+
+          
+      <!--Footer start-->
+      <footer id="class-sections-footer" class="footer">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col">
+              <a href="search-results.html" class="btn footer-button" role="button">BACK</a>
+            </div>
+            <div class="col">
+              <a href="completed-schedule.html" class="btn footer-button" role="button">DONE</a>
+            </div>
+          </div>
+        </div>
+      </footer>
+      <!--Footer end-->
+
+      <!--Modal start-->
+      <!--This modal dialog appears whenever the student clicks on the class section. It shows details about the course and 
+      it contains the button that allows the student to add the course to their proposed schedule.-->
+      <!--This section currently contains static hard-coded data.-->
+      <!--The data in this section needs to be dynamic and reflect whichever course section the student selects.-->
+      <div class="modal fade" id="classInfoModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div id="class-sections-modal-content" class="modal-content">
+            <div id="class-sections-modal-body" class="modal-body">
+              <p id="class-sections-modal-text">
+              Course: CSCI U150<br>
+              Title: Introduction to Computer Science<br>
+              CRN: 27469<br>
+              Sect: 01<br>
+              Instructor: Keith Hansen<br>
+              Days: Monday Wednesday Friday<br>
+              Time: 8:30am - 9:20am<br>
+              Availability: 12 of 24<br>
+              </p>
+            </div>
+            <div id="class-sections-modal-footer" class="modal-footer">
+              <button type="button" id="class-info-modal-button-add" class="btn class-sections-modal-button" data-dismiss="modal" data-toggle="modal" data-target="#classAddedModal">ADD</button>
+              <button type="button" id="class-info-modal-button-cancel" class="btn class-sections-modal-button" data-dismiss="modal">CANCEL</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--modal end-->
+
+      <!--Modal class added OR not added start-->
+      <!--This modal dialog appears after the student selects to add the course to their schedule.-->
+      <!--The message displayed is either a success message or error message. If the student has already added the course to their schedule, display an error message. Else, display a success message-->
+      <div class="modal fade" id="classAddedModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div id="class-sections-modal-content" class="modal-content">
+            <div id="class-sections-modal-body" class="modal-body">
+              <p id="class-sections-modal-text">
+              Course successfully added! or Error adding course. <!--Needs to be dynamic-->
+              </p>
+            </div>
+            <div id="class-sections-modal-footer" class="modal-footer">
+              <button type="button" id="class-added-modal-button-close" class="btn class-sections-modal-button" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--Modal class added OR not added end-->
+
+    </main>
+    <!--Swup end-->
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="node_modules/swup/dist/swup.min.js"></script>
+    <script src="script.js"></script>
+
+  </body>
+</html>
