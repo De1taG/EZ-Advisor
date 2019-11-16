@@ -4,6 +4,7 @@ from flask_login import LoginManager
 
 #this program defines what symbols the EZAdvisor package is resolving
 
+
 #create an app object
 app = Flask(__name__)
 

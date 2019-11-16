@@ -31,5 +31,18 @@ def logout():
 @app.route('/')
 @app.route('/index')
 def index():
-    image_file = url_for('static', filename='images/ez_trimmed.png')
-    return render_template('index.html', image_file=image_file)
+    return render_template('index.html')
+
+@app.route('/get-started')
+def get_started():
+    return render_template('get-started.html')
+
+
+@app.route('/build-schedule')
+def build_schedule():
+    return render_template('build-schedule.html')
+
+
+@app.route('/select-campus')
+def select_campus():
+    return render_template('select-campus.html')
