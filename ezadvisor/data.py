@@ -90,4 +90,4 @@ class Semester(db.Model):
 #keep track of person logged in
 @login.user_loader
 def load_user(vip_id):
-    return student.query.get(str(vip_id))
+    return student.query.get(str(id))
