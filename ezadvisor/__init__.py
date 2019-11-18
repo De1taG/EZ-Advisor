@@ -1,15 +1,15 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-from config import Config
 
 #this program defines what symbols the EZAdvisor package is resolving
+
 
 #create an app object
 app = Flask(__name__)
 
-#sets up the configuration for the app
-app.config.from_object(Config)
+app.config['SECRET_KEY'] = '99cc3d4722f75100d23302806c98e61'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 
 #create the database object
 db = SQLAlchemy(app)

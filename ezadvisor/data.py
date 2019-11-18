@@ -1,6 +1,6 @@
 from flask import Flask, render_template, url_for
 from flask_sqlalchemy import SQLAlchemy
-from ezadvisor import db, app
+from ezadvisor import db, app, login
 from flask_login import UserMixin
 
 required = db.Table('required',
@@ -18,6 +18,7 @@ registered = db.Table('registered',
     db.Column('student_id', db.Integer, db.ForeignKey('student.vip_id')),
     db.Column('course_id', db.String(10), db.ForeignKey('courses.course_id')),
     db.Column('submit', db.Date))
+    
 
 class Advisor(UserMixin, db.Model):
     vip_id = db.Column(db.Integer, primary_key=True)
@@ -27,6 +28,13 @@ class Advisor(UserMixin, db.Model):
     building = db.Column(db.String(50))
     student = db.relationship('Student', backref='advisor', lazy='joined')
 
+    def check_password(self, password):
+        return self.password == password
+    
+    def get_id(self):
+           return (self.vip_id)
+
+    
     def __repr__(self):
         return f"Advisor('{self.name}', '{self.email}', '{self.building}')"
 
@@ -42,6 +50,13 @@ class Student(UserMixin, db.Model):
     completed_Course = db.relationship('Catalog', secondary=completedCourses, backref=db.backref('completed', lazy='dynamic'))
     registered = db.relationship('Courses', secondary=registered, backref=db.backref('registered', lazy='dynamic'))
 
+    def check_password(self, password):
+        return self.password == password
+    
+    def get_id(self):
+           return (self.vip_id)
+    
+    
     def __repr__(self):
         return f"Student('{self.name}', '{self.email}', '{self.major_title}')"
 
@@ -90,4 +105,9 @@ class Semester(db.Model):
 #keep track of person logged in
 @login.user_loader
 def load_user(vip_id):
-    return student.query.get(str(id))
+    advisor = Advisor.query.get(str(vip_id))
+    student = Student.query.get(str(vip_id))
+    if student is None:
+        return advisor
+    else:
+        return student

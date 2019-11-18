@@ -39,16 +39,26 @@
     <div id="login-container" class="container-fluid h-100">
       <div class="row h-75 align-items-center">
         <div class="col-8 col-sm-7 col-md-6 col-lg-5 col-xl-4 mx-auto text-center">
-          <form id="login-form" class="p-5">
+          <div id="login-form" class="p-5">
             <h2 id="login-header" class="text-center mb-3">Login</h2>
-            <div class="form-group">
-              <input type="text" class="form-control input-login" name="username" placeholder="Network Username/VIP ID">
-            </div>
-            <div class="form-group">
-              <input type="password" class="form-control input-login" name="password" placeholder="Password">
-            </div>
-            <a href="{{ url_for('get_started') }}" id="btn-login-submit" class="btn btn-block" role="button">Submit</a>
-          </form>
+            <form action="" method="post" role="form">
+              {{ form.hidden_tag() }}
+              <div class="form-group">
+                {{ form.username(class_="form-control input-login") }}
+              </div>
+              <div class="form-group">
+                  {{ form.password(class_="form-control input-login") }}
+              </div>
+              {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                  {% for message in messages %}
+                    {{ message }}<br>
+                  {% endfor %}
+              {% endif %}
+              {% endwith %}
+              {{ form.submit(class_="btn btn-block", id="btn-login-submit") }}
+            </form>
+          </div>
         </div>
       </div>
     </div>
