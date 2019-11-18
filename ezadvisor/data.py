@@ -1,12 +1,7 @@
 from flask import Flask, render_template, url_for
 from flask_sqlalchemy import SQLAlchemy
-from ezadvisor import login 
 from ezadvisor import db, app
 from flask_login import UserMixin
-
-
-#configure the route to the database, this will change when the database gets deployed
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 
 required = db.Table('required',
     db.Column('major', db.String(40), db.ForeignKey('major.title')),
@@ -19,12 +14,12 @@ completedCourses = db.Table('completedCourses',
     db.Column('course_id', db.String(10), db.ForeignKey('catalog.course_id')),
     db.Column('grade', db.String(3)))
 
-registered = db.Table('registerd',
+registered = db.Table('registered',
     db.Column('student_id', db.Integer, db.ForeignKey('student.vip_id')),
     db.Column('course_id', db.String(10), db.ForeignKey('courses.course_id')),
     db.Column('submit', db.Date))
 
-class Advisor(db.Model):
+class Advisor(UserMixin, db.Model):
     vip_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(25))
     password = db.Column(db.String(25))
@@ -36,7 +31,8 @@ class Advisor(db.Model):
         return f"Advisor('{self.name}', '{self.email}', '{self.building}')"
 
 
-class Student(db.Model):
+
+class Student(UserMixin, db.Model):
     vip_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(25))
     password = db.Column(db.String(25))
@@ -93,5 +89,5 @@ class Semester(db.Model):
 
 #keep track of person logged in
 @login.user_loader
-def load_user(email):
-    return student.query.get(str(email))
+def load_user(vip_id):
+    return student.query.get(str(vip_id))

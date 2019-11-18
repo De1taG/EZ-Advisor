@@ -56,33 +56,34 @@
                 <h1 id="select-campus-header" class="page-header">Select USC Campus</h1>
               </div>
             </div>
-            <form action="/select-term.html" method="POST" role="form">
+            <form action="{{ url_for('select_term') }}" method="POST" role="form">
+              {{ form.hidden_tag() }}
               <div class="row">
                 <div class="col">
-                  <input type="submit" value="AIKEN" name="campus" class="butn select-campus-button">
+                  {{ form.aiken(class_="btn btn-block select-campus-button") }}
                 </div>
                 <div class="col">
-                  <input type="submit" value="BEAUFORT" name="campus" class="butn select-campus-button">
+                  {{ form.beaufort(class_="btn btn-block select-campus-button") }}
                 </div>
                 <div class="col">
-                  <input type="submit" value="COLUMBIA" name="campus" class="butn select-campus-button">
+                  {{ form.columbia(class_="btn btn-block select-campus-button") }}
                 </div>
                 <div class="col">
-                  <input type="submit" value="LANCASTER" name="campus" class="butn select-campus-button">
+                  {{ form.lancaster(class_="btn btn-block select-campus-button") }}
                 </div>
               </div>
               <div class="row">
                 <div class="col">
-                  <input type="submit" value="SALKEHATCHIE" name="campus" class="butn select-campus-button">
+                  {{ form.salkehatchie(class_="btn btn-block select-campus-button") }}
                 </div>
                 <div class="col">
-                  <input type="submit" value="SUMTER" name="campus" class="butn select-campus-button">
+                  {{ form.sumter(class_="btn btn-block select-campus-button") }}
                 </div>
                 <div class="col">
-                  <input type="submit" value="UNION" name="campus" class="butn select-campus-button">
+                  {{ form.union(class_="btn btn-block select-campus-button") }}
                 </div>
                 <div class="col">
-                  <input type="submit" value="UPSTATE" name="campus" class="butn select-campus-button">
+                  {{ form.upstate(class_="btn btn-block select-campus-button") }}
                 </div>
               </div>
             </form>

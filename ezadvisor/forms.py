@@ -7,3 +7,17 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Remember Me')
     submit = SubmitField('Sign In')
+
+class CampusForm(FlaskForm):
+    aiken = SubmitField('AIKEN')
+    beaufort = SubmitField('BEAUFORT')
+    columbia = SubmitField('COLUMBIA')
+    lancaster = SubmitField('LANCASTER')
+    salkehatchie = SubmitField('SALKEHATCHIE')
+    sumter = SubmitField('SUMTER')
+    union = SubmitField('UNION')
+    upstate = SubmitField('UPSTATE')
+
+class TermForm(FlaskForm):
+    spring = SubmitField('SPRING 2020')
+    summer = SubmitField('SUMMER 2020')

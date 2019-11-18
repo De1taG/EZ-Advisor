@@ -2,7 +2,7 @@ from flask import Flask, render_template, flash, redirect, request, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import current_user, login_user, logout_user, login_required
 from ezadvisor import app
-from ezadvisor.forms import LoginForm
+from ezadvisor.forms import LoginForm, CampusForm, TermForm
 from ezadvisor.data import Student
 
 
@@ -34,15 +34,32 @@ def index():
     return render_template('index.html')
 
 @app.route('/get-started')
+@login_required
 def get_started():
     return render_template('get-started.html')
 
 
 @app.route('/build-schedule')
+@login_required
 def build_schedule():
     return render_template('build-schedule.html')
 
 
-@app.route('/select-campus')
+@app.route('/select-campus', methods=['GET', 'POST'])
+@login_required
 def select_campus():
-    return render_template('select-campus.html')
+    form = CampusForm()
+    return render_template('select-campus.html', form=form)
+    
+
+@app.route('/select-term', methods=['GET', 'POST'])
+@login_required
+def select_term():
+    form = TermForm()
+    return render_template('select-term.html', form=form)
+
+
+@app.route('/select-subject', methods=['GET', 'POST'])
+@login_required
+def select_subject():
+    return render_template('select-subject.html')

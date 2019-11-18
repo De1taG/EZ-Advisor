@@ -52,7 +52,7 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col">
-            <a href="select-campus.html" class="btn back-button" role="button">BACK</a>
+            <a href="{{ url_for('select_campus') }}" class="btn back-button" role="button">BACK</a>
           </div>
         </div>
         <div class="row">
@@ -60,14 +60,17 @@
               <h1 id="select-term-header" class="page-header mt-0">Select term</h1>
           </div>
         </div>
-        <div class="row">
-          <div class="col-7 col-sm-6 col-md-5 col-lg-4 col-xl-3 mx-auto text-center">
-            <a href="/select-subject.html" class="btn btn-block select-term-button" role="button">SPRING 2020</a>
+        <form action="{{ url_for('select_subject') }}" method="POST" role="form">
+          {{ form.hidden_tag() }}
+          <div class="row">
+            <div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 mx-auto text-center">
+              {{ form.spring(class_="btn btn-block select-term-button") }}
+            </div>
+            <div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 mx-auto text-center">
+              {{ form.summer(class_="btn btn-block select-term-button") }}
+            </div>
           </div>
-          <div class="col-7 col-sm-6 col-md-5 col-lg-4 col-xl-3 mx-auto text-center">
-            <a href="/select-subject.html" class="btn btn-block select-term-button" role="button">SUMMER 2020</a>
-          </div>
-        </div>
+        </form>
       </div>
       <!--Select term end-->
     
