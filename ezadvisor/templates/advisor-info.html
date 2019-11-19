@@ -23,7 +23,7 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <!--Right now the logo in the navbar links page to index.html but this may not be the best design choice. Should the logo even be a link? We don't really have a home page. It's more for convenience at this stage.-->
-      <a href="index.html"><img class="navbar-brand" src="{{ url_for('static', filename='images/ez_trimmed.png')}}"></a>
+      <a href="{{ url_for('get_started')}}"><img class="navbar-brand" src="{{ url_for('static', filename='images/ez_trimmed.png')}}"></a>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
           <li class="nav-item">
@@ -57,16 +57,18 @@
             </div>
           </div>
           <div class="row">
+            {% for i in advisor %}
             <div id="advisor-info" class="col p-5 mx-5">
-              <h5 id="advisor-name"><strong>Wei Zhong</strong></h5>
+              <h5 id="advisor-name"><strong>{{i['name']}}</strong></h5>
               <p class="my-0 pt-2" id="advisor-info-content">
-                Professor<br>
-                Computer Science <br>
-                Hodge 209 <br>
-                <a id="advisor-email" href="mailto:wzhong@uscupstate.edu">wzhong@uscupstate.edu</a> <br>
-                <a id="advisor-phone" href="tel:864-503-5785">864-503-5785</a><br>
+                {{i['job']}}<br>
+                {{i['department']}} <br>
+                {{i['office']}} <br>
+                <a id="advisor-email" href="mailto:{{i['email']}}">{{i['email']}}</a> <br>
+                <a id="advisor-phone" href="tel:{{i['phone']}}">{{i['phone']}}</a><br>
               </p>
             </div>
+            {% endfor %}
           </div>
         </div>
       </div>

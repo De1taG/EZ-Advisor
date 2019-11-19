@@ -52,7 +52,7 @@
               {% with messages = get_flashed_messages() %}
               {% if messages %}
                   {% for message in messages %}
-                    {{ message }}<br>
+                    <span id="login-error-message" style="color: red;">{{ message }}</span><br>
                   {% endfor %}
               {% endif %}
               {% endwith %}

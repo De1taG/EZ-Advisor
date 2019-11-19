@@ -123,6 +123,7 @@ html.is-leaving .transition-fade {
 #login-header {
     color:white;
 }
+
 /*------------------------------*/
 
 
@@ -427,9 +428,6 @@ html.is-leaving .transition-fade {
     color: #07CB8B;
 }
 
-.modal-backdrop {
-    z-index: -1;
-}
 
 /*------------------------------------*/
 

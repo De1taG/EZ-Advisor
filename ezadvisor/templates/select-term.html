@@ -20,7 +20,7 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <!--Right now the logo in the navbar links page to index.html but this may not be the best design choice. Should the logo even be a link? We don't really have a home page. It's more for convenience at this stage.-->
-      <a href="index.html"><img class="navbar-brand" src="{{ url_for('static', filename='images/ez_trimmed.png')}}"></a>
+      <a href="{{ url_for('get_started')}}"><img class="navbar-brand" src="{{ url_for('static', filename='images/ez_trimmed.png')}}"></a>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
           <li class="nav-item">
@@ -40,7 +40,7 @@
           </ul>
       </div>
     </nav>
-    <!--Navbar end-->>
+    <!--Navbar end-->
       
       <!--Select term start-->
       <!--Currently this page contains static hard-coded term options.-->
@@ -57,14 +57,12 @@
           </div>
         </div>
         <form action="{{ url_for('select_subject') }}" method="POST" role="form">
-          {{ form.hidden_tag() }}
           <div class="row">
-            <div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 mx-auto text-center">
-              {{ form.spring(class_="btn btn-block select-term-button") }}
-            </div>
-            <div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 mx-auto text-center">
-              {{ form.summer(class_="btn btn-block select-term-button") }}
-            </div>
+              {% for i in range(terms | length) %}
+              <div class="col-10 col-sm-8 col-md-6 col-lg-5 col-xl-4 mx-auto text-center">
+                <input type="submit" name="term" class="btn btn-block select-term-button" value="{{terms[i].semester}}">
+              </div>
+              {% endfor %}
           </div>
         </form>
       </div>

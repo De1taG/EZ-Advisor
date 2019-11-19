@@ -19,7 +19,7 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <!--Right now the logo in the navbar links page to index.html but this may not be the best design choice. Should the logo even be a link? We don't really have a home page. It's more for convenience at this stage.-->
-      <a href="index.html"><img class="navbar-brand" src="{{ url_for('static', filename='images/ez_trimmed.png')}}"></a>
+      <a href="{{ url_for('get_started')}}"><img class="navbar-brand" src="{{ url_for('static', filename='images/ez_trimmed.png')}}"></a>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
           <li class="nav-item">
@@ -49,9 +49,10 @@
           <div class="col-11 col-sm-10 col-md-9 col-lg-8 col-xl-7 mx-auto text-center">
             <div class="row">
               <div class="col">
-                <h1 id="select-class-section-header" class="page-header">CSCI U150<br>Introduction to<br>Computer Science</h1> <!--Needs to be dynamic/pulled from database-->
+                <h1 id="select-class-section-header" class="page-header">{{ course_id }}<br>{{ course }}</h1> <!--Needs to be dynamic/pulled from database-->
               </div>
             </div>
+            {{ term }}
             <div class="row">
               <div class="col">
                 <h5 class="course-details-header">CRN</h5><!--This does not need to be dynamic-->
@@ -68,59 +69,30 @@
               <div class="col">
                 <h5 class="course-details-header">Time</h5><!--This does not need to be dynamic-->
               </div>
-                <div class="col">
-                <h5 class="course-details-header">Availability</h5><!--This does not need to be dynamic-->
-              </div>
             </div>
             <div class="row class-section-row">
               <div class="col">
-                <a href="#" class="btn btn-block select-class-section-button" role="button" data-toggle="modal" data-target="#classInfoModal">
+                {% for i in sections %}
+                <button type="button" class="btn btn-block select-class-section-button" data-toggle="modal" data-target="#classInfoModal{{ i.crn }}">
                   <div class="row">
                     <div class="col">
-                      27469 <!--Needs to be dynamic/pulled from database-->
+                      {{i['crn']}} <!--Needs to be dynamic/pulled from database-->
                     </div>
                     <div class="col">
-                      01 <!--Needs to be dynamic/pulled from database-->
+                      {{i['section_num']}} <!--Needs to be dynamic/pulled from database-->
                     </div>
                     <div class="col">
-                      Hansen, Keith <!--Needs to be dynamic/pulled from database-->
+                      {{i['professor_name']}} <!--Needs to be dynamic/pulled from database-->
                     </div>
                     <div class="col">
-                      MWF <!--Needs to be dynamic/pulled from database-->
+                      {{i['day']}} <!--Needs to be dynamic/pulled from database-->
                     </div>
                     <div class="col">
-                      8:30am-9:20am <!--Needs to be dynamic/pulled from database-->
-                    </div>
-                    <div class="col">
-                      12 of 24 <!--Needs to be dynamic/pulled from database-->
+                      {{i['start_time']}} - {{i['end_time']}} <!--Needs to be dynamic/pulled from database-->
                     </div>
                   </div>
-                </a>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <a href="#" class="btn btn-block select-class-section-button" role="button"></a>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <a href="#" class="btn btn-block select-class-section-button" role="button"></a>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <a href="#" class="btn btn-block select-class-section-button" role="button"></a>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <a href="#" class="btn btn-block select-class-section-button" role="button"></a>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col">
-                <a href="#" class="btn btn-block select-class-section-button" role="button"></a>
+                </button>
+                {% endfor %}
               </div>
             </div>
           </div>
@@ -128,50 +100,53 @@
       </div>
       <!--Class sections end-->
 
+      <!--Modal start-->
+      <!--This modal dialog appears whenever the student clicks on the class section. It shows details about the course and 
+      it contains the button that allows the student to add the course to their proposed schedule.-->
+      <!--This section currently contains static hard-coded data.-->
+      <!--The data in this section needs to be dynamic and reflect whichever course section the student selects.-->
+      {% for i in sections %}
+      <div class="modal fade" id="classInfoModal{{ i.crn }}" tabindex="-1" role="dialog" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div id="class-sections-modal-content" class="modal-content">
+              <div id="class-sections-modal-body" class="modal-body">
+                <p id="class-sections-modal-text">
+                Course: {{ i.course_id }}<br>
+                Title: {{ i.course_title }}<br>
+                CRN: {{ i.crn }}<br>
+                Sect: {{ i.section_num }}<br>
+                Instructor: {{ i.professor_name }}<br>
+                Days: {{ i.day }}<br>
+                Time: {{ i.start_time }} - {{ i.end_time }}<br>
+                </p>
+              </div>
+              <div id="class-sections-modal-footer" class="modal-footer">
+                <button type="button" id="class-info-modal-button-add" class="btn class-sections-modal-button" data-dismiss="modal" data-toggle="modal" data-target="#classAddedModal">ADD</button>
+                <button type="button" id="class-info-modal-button-cancel" class="btn class-sections-modal-button" data-dismiss="modal">CANCEL</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--modal end-->
+        {% endfor %}
+
           
       <!--Footer start-->
       <footer id="class-sections-footer" class="footer">
         <div class="container-fluid">
           <div class="row">
             <div class="col">
-              <a href="search-results.html" class="btn footer-button" role="button">BACK</a>
+              <a href="{{ url_for('search_results')}}" class="btn footer-button" role="button">BACK</a>
             </div>
             <div class="col">
-              <a href="completed-schedule.html" class="btn footer-button" role="button">DONE</a>
+              <a href="{{ url_for('completed_schedule')}}" class="btn footer-button" role="button">DONE</a>
             </div>
           </div>
         </div>
       </footer>
       <!--Footer end-->
 
-      <!--Modal start-->
-      <!--This modal dialog appears whenever the student clicks on the class section. It shows details about the course and 
-      it contains the button that allows the student to add the course to their proposed schedule.-->
-      <!--This section currently contains static hard-coded data.-->
-      <!--The data in this section needs to be dynamic and reflect whichever course section the student selects.-->
-      <div class="modal fade" id="classInfoModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div id="class-sections-modal-content" class="modal-content">
-            <div id="class-sections-modal-body" class="modal-body">
-              <p id="class-sections-modal-text">
-              Course: CSCI U150<br>
-              Title: Introduction to Computer Science<br>
-              CRN: 27469<br>
-              Sect: 01<br>
-              Instructor: Keith Hansen<br>
-              Days: Monday Wednesday Friday<br>
-              Time: 8:30am - 9:20am<br>
-              Availability: 12 of 24<br>
-              </p>
-            </div>
-            <div id="class-sections-modal-footer" class="modal-footer">
-              <button type="button" id="class-info-modal-button-add" class="btn class-sections-modal-button" data-dismiss="modal" data-toggle="modal" data-target="#classAddedModal">ADD</button>
-              <button type="button" id="class-info-modal-button-cancel" class="btn class-sections-modal-button" data-dismiss="modal">CANCEL</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!--modal end-->
+  
 
       <!--Modal class added OR not added start-->
       <!--This modal dialog appears after the student selects to add the course to their schedule.-->

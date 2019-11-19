@@ -1,6 +1,8 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 #this program defines what symbols the EZAdvisor package is resolving
 
@@ -11,8 +13,15 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = '99cc3d4722f75100d23302806c98e61'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 
+
 #create the database object
 db = SQLAlchemy(app)
+
+engine = create_engine('sqlite:///site.db')
+
+Session = sessionmaker(bind=engine)
+
+session = Session()
 
 #create the login sub system
 login = LoginManager(app)
