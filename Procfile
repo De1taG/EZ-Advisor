@@ -1,1 +1,1 @@
-web: gunicorn --pythonpath ezadvisor:app
+web: gunicorn ezadvisor:app
