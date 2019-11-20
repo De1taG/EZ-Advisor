@@ -12,6 +12,7 @@ app = Flask(__name__)
 
 app.config['SECRET_KEY'] = '99cc3d4722f75100d23302806c98e61'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 
 #create the database object
