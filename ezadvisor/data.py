@@ -62,6 +62,7 @@ class Student(UserMixin, db.Model):
     
     def __repr__(self):
         return f"Student('{self.name}', '{self.email}', '{self.major_title}')"
+        
 
 class Major(db.Model):
     title = db.Column(db.String(40), primary_key=True)
