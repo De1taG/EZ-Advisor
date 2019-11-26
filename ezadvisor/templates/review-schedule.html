@@ -8,7 +8,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400&display=swap" rel="stylesheet"> 
   </head>
   
   <body>
@@ -53,36 +53,74 @@
         <div class="col-11 col-sm-10 col-md-9 col-lg-8 col-xl-7 mx-auto text-center">
           <div class="row">
             <div class="col">
-              <h1 id="review-schedule-header" class="page-header my-5">Review Schedule</h1>
+              {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ category }} alert-dismissible">
+                    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                    {{ message }}
+                  </div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
             </div>
           </div>
           <div class="row">
-            <div id="schedule" class="col p-4 mx-5">
-              <h5 id="schedule-header">Spring 2019</h5>
-              <hr>
-              <p id="schedule-classes">
-                CS150 - 01 - 8:30am-9:20am - MWF <br>
-                CS150 - 01 - 8:30am-9:20am - MWF <br>
-                CS150 - 01 - 8:30am-9:20am - MWF <br>
-                CS150 - 01 - 8:30am-9:20am - MWF <br>
-                CS150 - 01 - 8:30am-9:20am - MWF <br>
-              </p>
-              <hr>
-              <span id="schedule-footer">Total Credit Hours: 15</span>
+            <div class="col">
+              <h1 id="review-schedule-header" class="page-header my-5">Review Schedule</h1>
             </div>
           </div>
-          <div class="row mt-4">
-            <div class="col">
-              <a href="#" class="btn review-schedule-button" role="button">SUBMIT TO ADVISOR</a>
+          <form action="" method="POST" role="form">
+            <div class="row">
+              <div id="schedule" class="col p-4 mx-5">
+                <h5 id="schedule-header">{{ semester }}</h5>
+                <hr>
+                <p id="schedule-classes">
+                  {% for i in classes %}
+                  {{ i.course_id|string + ' - ' + i.section_num|string + ' - ' + i.start_time + '-' + i.end_time + ' - ' + i.day }} 
+                  &nbsp; &nbsp;
+                  <a href="#" data-toggle="modal" data-target="#deleteModal{{ i.crn }}">Delete</a> 
+                  <br>
+                  {% endfor %}
+                </p>
+                <hr>
+                <input type="hidden" name="total_hours" value= "{{ hours.sum }}">
+                <span id="schedule-footer">Total Credit Hours: {{ hours.sum  }}</span>
+              </div>
             </div>
-            <div class="col">
-              <a href="select-subject.html" class="btn review-schedule-button" role="button">ADD MORE CLASSES</a>
+            <div class="row mt-4">
+              <div class="col">
+                <input type="submit" name="btn" class="btn review-schedule-button" value="SUBMIT TO ADVISOR">
+              </div>
+              <div class="col">
+                <a href="{{ url_for('select_subject') }}" class="btn review-schedule-button" role="button">ADD MORE CLASSES</a>
+              </div>
             </div>
-          </div>
+          </form>
         </div>
       </div>
     </div>
     <!--Schedule end-->
+
+  <!-- Modal -->
+  {% for i in classes %}
+  <div class="modal fade" id="deleteModal{{ i.crn }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <p id="remove-course-question" class="text-center">Are you sure you want to remove {{ i.course_id }}?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <form action="{{ url_for('review_schedule_student') }}" method="POST">
+              <input type="hidden" name="remove_course_crn" value= "{{ i.crn }}" />
+              <input class="btn btn-danger" type="submit" name="btn" value="Delete">
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

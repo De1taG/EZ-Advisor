@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import current_user, login_user, logout_user, login_required
 from ezadvisor import app, db
 from ezadvisor.forms import LoginForm
-from ezadvisor.data import Student, Advisor, Campus, Semester, Major, Courses, Catalog
+from ezadvisor.data import Student, Advisor, Campus, Semester, Major, Courses, Catalog, proposedSchedule, submittedSchedules
 from werkzeug.urls import url_parse
 
 @app.route('/', methods=['GET', 'POST'])
@@ -52,6 +52,9 @@ def build_schedule():
 @login_required
 def select_campus():
     campuses = Campus.query.all()
+    if request.method == 'POST':
+        session['campus'] = request.form.get('campus')
+        return redirect(url_for('select_term'))
     return render_template('select-campus.html', campuses=campuses)
     
 
@@ -60,7 +63,8 @@ def select_campus():
 def select_term():
     terms = Semester.query.all()
     if request.method == 'POST':
-        session['campus'] = request.form.get('campus')
+        session['term'] = request.form.get('term')
+        return redirect(url_for('select_subject'))
     return render_template('select-term.html', terms=terms)
 
 
@@ -69,7 +73,8 @@ def select_term():
 def select_subject():
     subject = Major.query.all()
     if request.method == 'POST':
-        session['term'] = request.form.get('term')
+        session['subject'] = request.form.get('subject')
+        return redirect(url_for('search_results'))
     return render_template('select-subject.html', subject=subject)
 
 
@@ -77,7 +82,8 @@ def select_subject():
 @login_required
 def search_results():
     if request.method == 'POST':
-        session['subject'] = request.form.get('subject')
+        session['course'] = request.form.get('course')
+        return redirect(url_for('class_sections'))
     courses = db.session.execute('SELECT * FROM catalog WHERE course_id in \
         (SELECT course_id FROM courses WHERE campus = :val1 AND semester = :val2 )', {'val1': session['campus'], 'val2': session['term']})
     return render_template('search-results.html', courses=courses)
@@ -87,27 +93,76 @@ def search_results():
 @login_required
 def class_sections():
     if request.method == 'POST':
-        session['course'] = request.form.get('course')
+        flash('Course successfully added!', 'dark')
+        crn = request.form.get('course_crn')
+        semester = request.form.get('course_semester')
+        new_course = proposedSchedule(student_vip_id = current_user.vip_id, course_crn = crn, semester=semester)
+        db.session.add(new_course)
+        db.session.commit()
+        return redirect(url_for('class_sections'))
     course = session['course']
     course_id = course[0 : 9]
     course = course[11:]
-    term = session['term']
     sections = db.session.execute('SELECT * FROM courses \
              WHERE campus = :val1 AND semester = :val2 AND course_id = :val3', \
-            {'val1': session['campus'], 'val2': term, 'val3': course_id})
+            {'val1': session['campus'], 'val2': session['term'], 'val3': course_id})
     return render_template('class-sections.html', sections=list(sections), course_id=course_id, course=course)
 
 
 @app.route('/completed-schedule', methods=['GET', 'POST'])
 @login_required
 def completed_schedule():
-    return render_template('completed-schedule.html')
+    classes = db.session.execute('SELECT courses.* FROM proposed_schedule \
+        left JOIN courses on proposed_schedule.course_crn = courses.crn \
+        where proposed_schedule.student_vip_id = :val1 and proposed_schedule.semester= :val2', \
+        {'val1': current_user.vip_id, 'val2': session['term']})
+    hours = db.session.execute('SELECT sum(courses.credit_hours) as sum FROM proposed_schedule \
+        left JOIN courses on proposed_schedule.course_crn = courses.crn \
+        where proposed_schedule.student_vip_id = :val1 and proposed_schedule.semester= :val2', \
+        {'val1': current_user.vip_id, 'val2': session['term']})
+    if request.method == 'POST':
+        total_hours = request.form.get('total_hours')
+        if total_hours == '0':
+            flash('Error: You cannot submit a schedule with zero classes added.', 'danger')
+        else:
+            flash('Your schedule has been submitted to your advisor for feedback!', 'dark')
+            semester = session['term']
+            new_schedule = submittedSchedules(student_vip_id = current_user.vip_id, advisor_vip_id = current_user.advisor_id, semester = semester, status = 'Needs Review')
+            db.session.add(new_schedule)
+            db.session.commit()
+        return redirect(url_for('review_schedule_student'))
+    return render_template('completed-schedule.html', classes=list(classes), hours=hours.first(), semester=session['term'])
 
 
 @app.route('/review-schedule', methods=['GET', 'POST'])
 @login_required
 def review_schedule_student():
-    return render_template('review-schedule.html')
+    classes = db.session.execute('SELECT courses.* FROM proposed_schedule \
+        left JOIN courses on proposed_schedule.course_crn = courses.crn \
+        where proposed_schedule.student_vip_id = :val1 and proposed_schedule.semester= :val2', \
+        {'val1': current_user.vip_id, 'val2': session['term']})
+    hours = db.session.execute('SELECT (case when sum(courses.credit_hours) > 0 then sum(courses.credit_hours) else 0 end) \
+        as "sum"  FROM proposed_schedule \
+        left JOIN courses on proposed_schedule.course_crn = courses.crn \
+        where proposed_schedule.student_vip_id = :val1 and proposed_schedule.semester= :val2', \
+        {'val1': current_user.vip_id, 'val2': session['term']})
+    if request.method == 'POST':
+        total_hours = request.form.get('total_hours')
+        if total_hours == '0':
+            flash('Error: You cannot submit a schedule with zero classes added.', 'danger')
+        elif request.form['btn'] == 'Delete':
+            course_crn = request.form.get('remove_course_crn')
+            course = proposedSchedule.query.filter_by(student_vip_id=current_user.vip_id, course_crn=course_crn, semester=session['term']).delete()
+            db.session.commit()
+            flash('Class has been deleted.', 'dark')
+        else:
+            flash('Your schedule has been submitted to your advisor for feedback!', 'dark')
+            semester = session['term']
+            new_schedule = submittedSchedules(student_vip_id = current_user.vip_id, advisor_vip_id = current_user.advisor_id, semester = semester, status = 'Needs Review')
+            db.session.add(new_schedule)
+            db.session.commit()
+        return redirect(url_for('review_schedule_student'))
+    return render_template('review-schedule.html', classes=list(classes), hours=hours.first(), semester=session['term'])
 
 
 @app.route('/advisor-info', methods=['GET', 'POST'])

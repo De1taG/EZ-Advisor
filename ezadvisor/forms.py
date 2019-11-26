@@ -9,4 +9,21 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()], render_kw={"placeholder": "Password"})
     remember_me = BooleanField('Remember Me')
     submit = SubmitField('Sign In')
+
+class CampusForm(FlaskForm):
+    campus = SubmitField()
+
+class SemesterForm(FlaskForm):
+    semester = SubmitField()
+
+class SubjectForm(FlaskForm):
+    subject = SubmitField()
+
+class CourseForm(FlaskForm):
+    course = SubmitField()
+
+class SectionForm(FlaskForm):
+    add = SubmitField('Add')
+    cancel = SubmitField('Cancel')
+    
     

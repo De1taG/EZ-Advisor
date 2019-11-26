@@ -2,6 +2,8 @@ from flask import Flask, render_template, url_for
 from flask_sqlalchemy import SQLAlchemy
 from ezadvisor import db, app, login
 from flask_login import UserMixin
+import datetime
+from sqlalchemy import DateTime
 
 # required = db.Table('required',
 #     db.Column('major', db.String(40), db.ForeignKey('major.title')),
@@ -14,11 +16,20 @@ completedCourses = db.Table('completedCourses',
     db.Column('course_id', db.String(10), db.ForeignKey('catalog.course_id')),
     db.Column('grade', db.String(3)))
 
-registered = db.Table('registered',
-    db.Column('student_id', db.Integer, db.ForeignKey('student.vip_id')),
-    db.Column('course_id', db.String(10), db.ForeignKey('courses.course_id')),
-    db.Column('submit', db.Date))
+class submittedSchedules(db.Model):
+    student_vip_id = db.Column(db.Integer, db.ForeignKey('student.vip_id'), primary_key=True)
+    advisor_vip_id = db.Column(db.Integer, db.ForeignKey('advisor.vip_id'), primary_key=True)
+    semester = db.Column(db.String(20), db.ForeignKey('semester.semester'), primary_key=True)
+    submit_datetime = db.Column(DateTime, default=datetime.datetime.utcnow)
+    status = db.Column(db.String(30), primary_key=True)
+    advisor_feedback = db.Column(db.String(1000))
     
+
+class proposedSchedule(db.Model):
+    student_vip_id = db.Column(db.Integer, db.ForeignKey('student.vip_id'), primary_key=True)
+    course_crn = db.Column(db.Integer, db.ForeignKey('courses.crn'), primary_key=True)
+    semester = db.Column(db.String(20), db.ForeignKey('semester.semester'), primary_key=True)
+
 
 class Advisor(UserMixin, db.Model):
     vip_id = db.Column(db.Integer, primary_key=True)
@@ -51,7 +62,7 @@ class Student(UserMixin, db.Model):
     major_title = db.Column(db.String(50), db.ForeignKey('major.title'))
     advisor_id = db.Column(db.Integer, db.ForeignKey('advisor.vip_id'))
     completed_Course = db.relationship('Catalog', secondary=completedCourses, backref=db.backref('completed', lazy='dynamic'))
-    registered = db.relationship('Courses', secondary=registered, backref=db.backref('registered', lazy='dynamic'))
+    #registered = db.relationship('Courses', secondary=registered, backref=db.backref('registered', lazy='dynamic'))
 
     def check_password(self, password):
         return self.password == password
@@ -95,6 +106,7 @@ class Courses(db.Model):
     start_time = db.Column(db.String(10))
     end_time = db.Column(db.String(10))
     campus = db.Column(db.String(25))
+    credit_hours = db.Column(db.Integer)
 
     def __repr__(self):
         return f"Courses('{self.course_id}', '{self.section_num}', '{self.semester}', '{self.day}', '{self.start_time_MWF}', '{self.end_time_MWF}', '{self.start_time_TTh}', '{self.end_time_MWF}')"

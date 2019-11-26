@@ -18,7 +18,6 @@
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <!--Right now the logo in the navbar links page to index.html but this may not be the best design choice. Should the logo even be a link? We don't really have a home page. It's more for convenience at this stage.-->
       <a href="{{ url_for('get_started')}}"><img class="navbar-brand" src="{{ url_for('static', filename='images/ez_trimmed.png')}}"></a>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
@@ -42,32 +41,44 @@
     <!--Navbar end-->
 
       <!--Class sections start-->
-      <!--This section currently contains static hard-coded data.-->
-      <!--The data in this section needs to be dynamic and reflect whichever course the student selected on the previous page.-->
       <div id="class-sections-container" class="container-fluid">
         <div class="row">
           <div class="col-11 col-sm-10 col-md-9 col-lg-8 col-xl-7 mx-auto text-center">
             <div class="row">
               <div class="col">
-                <h1 id="select-class-section-header" class="page-header">{{ course_id }}<br>{{ course }}</h1> <!--Needs to be dynamic/pulled from database-->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                  {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible">
+                      <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                      {{ message }}
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              {% endwith %}
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <h1 id="select-class-section-header" class="page-header">{{ course_id }}<br>{{ course }}</h1>
               </div>
             </div>
             {{ term }}
             <div class="row">
               <div class="col">
-                <h5 class="course-details-header">CRN</h5><!--This does not need to be dynamic-->
+                <h5 class="course-details-header">CRN</h5>
               </div>
               <div class="col">
-                <h5 class="course-details-header">Sect</h5><!--This does not need to be dynamic-->
+                <h5 class="course-details-header">Sect</h5>
               </div>
               <div class="col">
-                <h5 class="course-details-header">Instructor</h5><!--This does not need to be dynamic-->
+                <h5 class="course-details-header">Instructor</h5>
               </div>
               <div class="col">
-                <h5 class="course-details-header">Days</h5><!--This does not need to be dynamic-->
+                <h5 class="course-details-header">Days</h5>
               </div>
               <div class="col">
-                <h5 class="course-details-header">Time</h5><!--This does not need to be dynamic-->
+                <h5 class="course-details-header">Time</h5>
               </div>
             </div>
             <div class="row class-section-row">
@@ -76,19 +87,19 @@
                 <button type="button" class="btn btn-block select-class-section-button" data-toggle="modal" data-target="#classInfoModal{{ i.crn }}">
                   <div class="row">
                     <div class="col">
-                      {{i['crn']}} <!--Needs to be dynamic/pulled from database-->
+                      {{i['crn']}} 
                     </div>
                     <div class="col">
-                      {{i['section_num']}} <!--Needs to be dynamic/pulled from database-->
+                      {{i['section_num']}}
                     </div>
                     <div class="col">
-                      {{i['professor_name']}} <!--Needs to be dynamic/pulled from database-->
+                      {{i['professor_name']}}
                     </div>
                     <div class="col">
-                      {{i['day']}} <!--Needs to be dynamic/pulled from database-->
+                      {{i['day']}}
                     </div>
                     <div class="col">
-                      {{i['start_time']}} - {{i['end_time']}} <!--Needs to be dynamic/pulled from database-->
+                      {{i['start_time']}} - {{i['end_time']}}
                     </div>
                   </div>
                 </button>
@@ -103,27 +114,30 @@
       <!--Modal start-->
       <!--This modal dialog appears whenever the student clicks on the class section. It shows details about the course and 
       it contains the button that allows the student to add the course to their proposed schedule.-->
-      <!--This section currently contains static hard-coded data.-->
-      <!--The data in this section needs to be dynamic and reflect whichever course section the student selects.-->
-      {% for i in sections %}
-      <div class="modal fade" id="classInfoModal{{ i.crn }}" tabindex="-1" role="dialog" aria-hidden="true">
+      {% for section in sections %}
+      <div class="modal fade" id="classInfoModal{{ section.crn }}" tabindex="-1" role="dialog" aria-hidden="true">
           <div class="modal-dialog" role="document">
             <div id="class-sections-modal-content" class="modal-content">
-              <div id="class-sections-modal-body" class="modal-body">
-                <p id="class-sections-modal-text">
-                Course: {{ i.course_id }}<br>
-                Title: {{ i.course_title }}<br>
-                CRN: {{ i.crn }}<br>
-                Sect: {{ i.section_num }}<br>
-                Instructor: {{ i.professor_name }}<br>
-                Days: {{ i.day }}<br>
-                Time: {{ i.start_time }} - {{ i.end_time }}<br>
-                </p>
-              </div>
-              <div id="class-sections-modal-footer" class="modal-footer">
-                <button type="button" id="class-info-modal-button-add" class="btn class-sections-modal-button" data-dismiss="modal" data-toggle="modal" data-target="#classAddedModal">ADD</button>
-                <button type="button" id="class-info-modal-button-cancel" class="btn class-sections-modal-button" data-dismiss="modal">CANCEL</button>
-              </div>
+              <form action="#" method="POST" role="form" id="addCourseForm">
+                <div id="class-sections-modal-body" class="modal-body">
+                  <p id="class-sections-modal-text">
+                    Course: {{ section.course_id }}<br>
+                    Title: {{ section.course_title }}<br>
+                    <input type="hidden" name="course_crn" value= "{{ section.crn }}" />
+                    CRN: {{ section.crn }}<br>
+                    Sect: {{ section.section_num }}<br>
+                    Instructor: {{ section.professor_name }}<br>
+                    <input type="hidden" name="course_semester" value= "{{ section.semester }}" />
+                    Semester: {{ section.semester }}<br>
+                    Days: {{ section.day }}<br>
+                    Time: {{ section.start_time }} - {{ section.end_time }}<br>
+                  </p>
+                </div>
+                <div id="class-sections-modal-footer" class="modal-footer">
+                  <input type="submit" id="class-info-modal-button-add" class="btn class-sections-modal-button" value="ADD">
+                  <button type="button" id="class-info-modal-button-cancel" class="btn class-sections-modal-button" data-dismiss="modal">CANCEL</button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
@@ -176,5 +190,11 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="{{ url_for('static', filename='swup.min.js')}}"></script>
     <script src="{{ url_for('static', filename='script.js')}}"></script>
+    <script>
+      $('#addCourseForm').on('submit', function(e){
+      $('#classAddedModal').modal('show');
+      e.preventDefault();
+      });
+    </script>
   </body>
 </html>
