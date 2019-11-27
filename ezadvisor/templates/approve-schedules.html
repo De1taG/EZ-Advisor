@@ -35,7 +35,7 @@
     <!--The data in this section needs to be dynamic-->
     <div class="container-fluid">
       <div class="row">
-        <div class="col-sm-11 col-md-10 col-lg-9 col-xl-9 mx-auto text-center">
+        <div class="col-sm-11 col-md-10 col-lg-10 col-xl-10 mx-auto text-center">
           <div class="row">
             <div class="col">
               <h1 id="approve-schedules-header" class="page-header my-5">Approve Schedules</h1>
@@ -45,13 +45,16 @@
             <div id="schedule" class="col p-4 mx-5">
               <div class="row">
                 <div class="col">
-                  <span class="approve-schedules-header"><Strong>First name</Strong></span><!--This does not need to be dynamic-->
+                  <span class="approve-schedules-header"><Strong>VIP ID</Strong></span><!--This does not need to be dynamic-->
                 </div>
                 <div class="col">
-                  <span class="approve-schedules-header"><Strong>Last name</Strong></span><!--This does not need to be dynamic-->
+                  <span class="approve-schedules-header"><Strong>Name</Strong></span><!--This does not need to be dynamic-->
                 </div>
                 <div class="col">
-                  <span class="approve-schedules-header"><Strong>Submitted Date</Strong></span><!--This does not need to be dynamic-->
+                  <span class="approve-schedules-header"><Strong>Submit Date</Strong></span><!--This does not need to be dynamic-->
+                </div>
+                <div class="col">
+                  <span class="approve-schedules-header"><Strong>Semester</Strong></span><!--This does not need to be dynamic-->
                 </div>
                 <div class="col">
                   <span class="approve-schedules-header"><Strong>Status</Strong></span><!--This does not need to be dynamic-->
@@ -61,23 +64,34 @@
                 </div>
               </div>
               <hr>
-              <div class="row">
-                <div class="col">
-                  <span class="student-info">John</span>
+              {% for i in schedules %}
+              <form action="" method="POST" role="form">
+                <div class="row">
+                  <div class="col">
+                    <input type="hidden" name="view_schedule_vip_id" value= "{{ i.student_vip_id }}" />
+                    <span class="student-info">{{ i.student_vip_id }}</span>
+                  </div>
+                  <div class="col">
+                    <input type="hidden" name="view_schedule_name" value= "{{ i.name }}" />
+                    <span class="student-info">{{ i.name }}</span>
+                  </div>
+                  <div class="col">
+                    <span class="student-info">{{ i.submitted_date}}</span>
+                  </div>
+                  <div class="col">
+                    <input type="hidden" name="view_schedule_semester" value= "{{ i.semester }}" />
+                    <span class="student-info">{{ i.semester }}</span>
+                  </div>
+                  <div class="col">
+                    <span class="student-info">{{ i.status }}</span>
+                  </div>
+                  <div class="col">
+                    <input type="submit" class="view-link" value="View"/>
+                  </div>
                 </div>
-                <div class="col">
-                  <span class="student-info">Smith</span>
-                </div>
-                <div class="col">
-                  <span class="student-info">11/01/2019</span>
-                </div>
-                <div class="col">
-                  <span class="student-info">Review needed</span>
-                </div>
-                <div class="col">
-                  <a href="{{ url_for('review_schedule_advisor')}}" class="student-info">View</a>
-                </div>
-              </div>
+                <br>
+              </form>
+              {% endfor %}
             </div>
           </div>
         </div>

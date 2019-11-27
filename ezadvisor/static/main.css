@@ -502,8 +502,13 @@ hr {
     font-size: 14px;
 }
 
-.student-info {
-    font-size: 14px;
+.view-link {
+    background: none;
+    border: none;
+    outline: none;
+    text-decoration: none;
+    color: blue;
+    cursor: pointer;
 }
 /*-------------------------------------------------------*/
 

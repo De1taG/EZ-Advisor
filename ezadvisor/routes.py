@@ -176,17 +176,36 @@ def advisor_info():
 
 ############# Advisor pages ##############
 
-@app.route('/approve-schedules')
+@app.route('/approve-schedules', methods=['GET', 'POST'])
 @login_required
 def approve_schedules():
     student = Student.query.filter_by(vip_id=current_user.vip_id).first()
     advisor = Advisor.query.filter_by(vip_id=current_user.vip_id).first()
     if advisor is None:
         return redirect(url_for('build_schedule'))
-    return render_template('approve-schedules.html')
+    schedules = db.session.execute("select student.name, substr(submitted_schedules.submit_datetime, 1, pos1-1) as submitted_date, \
+        submitted_schedules.student_vip_id, submitted_schedules.semester, submitted_schedules.status from (select *, instr(submit_datetime, ' ') as pos1 \
+        from submitted_schedules) as submitted_schedules left join student on submitted_schedules.student_vip_id = student.vip_id \
+        where advisor_vip_id = :val1", {"val1": current_user.vip_id})
+    if request.method == 'POST':
+        session['student_vip_id'] = request.form.get('view_schedule_vip_id')
+        session['semester'] = request.form.get('view_schedule_semester')
+        session['student_name'] = request.form.get('view_schedule_name')
+        return redirect(url_for('review_schedule_advisor'))
+    return render_template('approve-schedules.html', schedules=schedules)
 
-
-@app.route('/review-schedule-advisor-view')
+@app.route('/review-schedule-advisor-view', methods=['GET', 'POST'])
 @login_required
 def review_schedule_advisor():
-    return render_template('review-schedule-advisor-view.html')
+    student_name = session['student_name']
+    semester = session['semester']
+    classes = db.session.execute('SELECT courses.* FROM proposed_schedule \
+        left JOIN courses on proposed_schedule.course_crn = courses.crn \
+        where proposed_schedule.student_vip_id = :val1 and proposed_schedule.semester= :val2', \
+        {'val1': session['student_vip_id'], 'val2': session['semester']})
+    hours = db.session.execute('SELECT (case when sum(courses.credit_hours) > 0 then sum(courses.credit_hours) else 0 end) \
+        as "sum"  FROM proposed_schedule \
+        left JOIN courses on proposed_schedule.course_crn = courses.crn \
+        where proposed_schedule.student_vip_id = :val1 and proposed_schedule.semester= :val2', \
+        {'val1': session['student_vip_id'], 'val2': session['semester']})
+    return render_template('review-schedule-advisor-view.html', classes=list(classes), hours=hours.first(), student_name=session['student_name'], semester = semester)

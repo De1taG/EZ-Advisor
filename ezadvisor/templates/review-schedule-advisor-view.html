@@ -43,22 +43,21 @@
         <div class="col-11 col-sm-10 col-md-9 col-lg-8 col-xl-7 mx-auto text-center">
           <div class="row">
             <div class="col">
-              <h1 id="review-schedule-header" class="page-header my-5">John Smith's Schedule</h1>
+              <h1 id="review-schedule-header" class="page-header my-5">{{ student_name }}'s Schedule</h1>
             </div>
           </div>
           <div class="row">
             <div id="schedule" class="col p-4 mx-5">
-              <h5 id="schedule-header">Spring 2019</h5>
+              <h5 id="schedule-header">{{ semester }}</h5>
               <hr>
               <p id="schedule-classes">
-                CS150 - 01 - 8:30am-9:20am - MWF <br>
-                CS150 - 01 - 8:30am-9:20am - MWF <br>
-                CS150 - 01 - 8:30am-9:20am - MWF <br>
-                CS150 - 01 - 8:30am-9:20am - MWF <br>
-                CS150 - 01 - 8:30am-9:20am - MWF <br>
+                {% for i in classes %}
+                {{ i.course_id|string + ' - ' + i.section_num|string + ' - ' + i.start_time + '-' + i.end_time + ' - ' + i.day }} 
+                <br>
+                {% endfor %}
               </p>
               <hr>
-              <span id="schedule-footer">Total Credit Hours: 15</span>
+              <span id="schedule-footer">Total Credit Hours: {{ hours.sum  }}</span>
             </div>
           </div>
           <div class="row mt-4">
