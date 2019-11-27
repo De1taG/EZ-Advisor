@@ -199,6 +199,7 @@ def approve_schedules():
 def review_schedule_advisor():
     student_name = session['student_name']
     semester = session['semester']
+    student_vip_id = session['student_vip_id']
     classes = db.session.execute('SELECT courses.* FROM proposed_schedule \
         left JOIN courses on proposed_schedule.course_crn = courses.crn \
         where proposed_schedule.student_vip_id = :val1 and proposed_schedule.semester= :val2', \
@@ -208,4 +209,11 @@ def review_schedule_advisor():
         left JOIN courses on proposed_schedule.course_crn = courses.crn \
         where proposed_schedule.student_vip_id = :val1 and proposed_schedule.semester= :val2', \
         {'val1': session['student_vip_id'], 'val2': session['semester']})
+    if request.method == 'POST':
+        if request.form['btn'] == 'APPROVE':
+            schedule = submittedSchedules.query.filter_by(student_vip_id=student_vip_id).first()
+            schedule.status = 'Approved'
+            db.session.commit()
+            flash('Schedule approved!', 'dark')
+        return redirect(url_for('review_schedule_advisor'))
     return render_template('review-schedule-advisor-view.html', classes=list(classes), hours=hours.first(), student_name=session['student_name'], semester = semester)
