@@ -120,6 +120,8 @@ def completed_schedule():
         left JOIN courses on proposed_schedule.course_crn = courses.crn \
         where proposed_schedule.student_vip_id = :val1 and proposed_schedule.semester= :val2', \
         {'val1': current_user.vip_id, 'val2': session['term']})
+    status = db.session.execute('select case when count(student_vip_id) = 0 then "Not submitted" else status end as status \
+        from submitted_schedules where student_vip_id = :val1', {'val1': current_user.vip_id})
     if request.method == 'POST':
         total_hours = request.form.get('total_hours')
         if total_hours == '0':
@@ -131,7 +133,7 @@ def completed_schedule():
             db.session.add(new_schedule)
             db.session.commit()
         return redirect(url_for('review_schedule_student'))
-    return render_template('completed-schedule.html', classes=list(classes), hours=hours.first(), semester=session['term'])
+    return render_template('completed-schedule.html', classes=list(classes), hours=hours.first(), semester=session['term'], status=status.first())
 
 
 @app.route('/review-schedule', methods=['GET', 'POST'])
@@ -146,6 +148,8 @@ def review_schedule_student():
         left JOIN courses on proposed_schedule.course_crn = courses.crn \
         where proposed_schedule.student_vip_id = :val1 and proposed_schedule.semester= :val2', \
         {'val1': current_user.vip_id, 'val2': session['term']})
+    status = db.session.execute('select case when count(student_vip_id) = 0 then "Not submitted" else status end as status \
+        from submitted_schedules where student_vip_id = :val1', {'val1': current_user.vip_id})
     if request.method == 'POST':
         total_hours = request.form.get('total_hours')
         if total_hours == '0':
@@ -162,7 +166,7 @@ def review_schedule_student():
             db.session.add(new_schedule)
             db.session.commit()
         return redirect(url_for('review_schedule_student'))
-    return render_template('review-schedule.html', classes=list(classes), hours=hours.first(), semester=session['term'])
+    return render_template('review-schedule.html', classes=list(classes), hours=hours.first(), semester=session['term'], status=status.first())
 
 
 @app.route('/advisor-info', methods=['GET', 'POST'])

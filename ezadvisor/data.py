@@ -21,7 +21,7 @@ class submittedSchedules(db.Model):
     advisor_vip_id = db.Column(db.Integer, db.ForeignKey('advisor.vip_id'), primary_key=True)
     semester = db.Column(db.String(20), db.ForeignKey('semester.semester'), primary_key=True)
     submit_datetime = db.Column(DateTime, default=datetime.datetime.utcnow)
-    status = db.Column(db.String(30), primary_key=True)
+    status = db.Column(db.String(30), primary_key=True, default='Not submitted')
     advisor_feedback = db.Column(db.String(1000))
     
 
