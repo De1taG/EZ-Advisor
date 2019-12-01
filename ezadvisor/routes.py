@@ -38,6 +38,12 @@ def logout():
 @app.route('/get-started', methods=['GET', 'POST'])
 @login_required
 def get_started():
+    if request.method == 'POST':
+        student = Student.query.filter_by(vip_id=current_user.vip_id).first()
+        if student is None:
+            return redirect(url_for('approve_schedules'))
+        else:
+            return redirect(url_for('build_schedule'))
     return render_template('get-started.html')
 
 @app.route('/access-denied')
@@ -289,10 +295,9 @@ def advisor_info():
 @app.route('/approve-schedules', methods=['GET', 'POST'])
 @login_required
 def approve_schedules():
-    student = Student.query.filter_by(vip_id=current_user.vip_id).first()
     advisor = Advisor.query.filter_by(vip_id=current_user.vip_id).first()
     if advisor is None:
-        return redirect(url_for('build_schedule'))
+        return redirect(url_for('access_denied'))
     schedules = db.session.execute("select student.name, substr(submitted_schedules.submit_datetime, 1, pos1-1) as submitted_date, \
         submitted_schedules.student_vip_id, submitted_schedules.semester, submitted_schedules.status from (select *, instr(submit_datetime, ' ') as pos1 \
         from submitted_schedules) as submitted_schedules left join student on submitted_schedules.student_vip_id = student.vip_id \
