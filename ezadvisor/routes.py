@@ -86,7 +86,9 @@ def search_results():
         session['course'] = request.form.get('course')
         return redirect(url_for('class_sections'))
     courses = db.session.execute('SELECT * FROM catalog WHERE course_id in \
-        (SELECT course_id FROM courses WHERE campus = :val1 AND semester = :val2 )', {'val1': session['campus'], 'val2': session['term']})
+        (SELECT course_id FROM courses WHERE campus = :val1 AND semester = :val2) AND course_id NOT IN \
+        (SELECT course_id FROM completedCourses where student_id = :val3 and grade <= :val4)', \
+        {'val1': session['campus'], 'val2': session['term'], 'val3': current_user.vip_id, 'val4': 'C'})
     return render_template('search-results.html', courses=courses)
 
 
@@ -106,7 +108,7 @@ def class_sections():
             db.session.commit()
             flash('Course successfully added!', 'dark')
         else:
-            flash('You have already added this course to your schedule', 'danger')
+            flash('Error: You have already added this course to your schedule', 'danger')
         return redirect(url_for('class_sections'))
     course = session['course']
     course_id = course[0 : 9]
@@ -132,7 +134,7 @@ def completed_schedule():
         from submitted_schedules where student_vip_id = :val1', {'val1': current_user.vip_id})
     feedback = db.session.execute('SELECT (case when advisor_feedback is null then "No feedback" else advisor_feedback end) \
         as advisor_feedback FROM submitted_schedules where student_vip_id = :val1 and semester= :val2', \
-        {'val1': session['student_vip_id'], 'val2': session['semester']})
+        {'val1': session['student_vip_id'], 'val2': session['term']})
     if request.method == 'POST':
         total_hours = request.form.get('total_hours')
         if total_hours == '0':
@@ -149,11 +151,16 @@ def completed_schedule():
                 new_schedule = submittedSchedules(student_vip_id = current_user.vip_id, advisor_vip_id = current_user.advisor_id, semester = semester, status = 'Needs Review')
                 db.session.add(new_schedule)
                 db.session.commit()
+                flash('Your schedule has been submitted to your advisor for feedback!', 'dark')
             else:
-                schedule.status = 'Changes made'
-                schedule.advisor_feedback = None
-                db.session.commit()
-            flash('Your schedule has been submitted to your advisor for feedback!', 'dark')
+                schedule = submittedSchedules.query.filter_by(student_vip_id = current_user.vip_id, semester = semester).first()
+                if schedule is None:
+                    schedule.status = 'Changes made'
+                    schedule.advisor_feedback = None
+                    db.session.commit()
+                    flash('Your schedule has been submitted to your advisor for feedback!', 'dark')
+                else:
+                    flash('Error: You cannot submit your schedule again until your advisor provides feedback.', 'danger')
         return redirect(url_for('review_schedule_student'))
     return render_template('completed-schedule.html', classes=list(classes), hours=hours.first(), semester=session['term'], status=status.first(), feedback=feedback.first())
 
@@ -174,7 +181,7 @@ def review_schedule_student():
         from submitted_schedules where student_vip_id = :val1', {'val1': current_user.vip_id})
     feedback = db.session.execute('SELECT (case when advisor_feedback is null then "No feedback" else advisor_feedback end) \
         as advisor_feedback FROM submitted_schedules where student_vip_id = :val1 and semester= :val2', \
-        {'val1': session['student_vip_id'], 'val2': session['semester']})
+        {'val1': session['student_vip_id'], 'val2': session['term']})
     if request.method == 'POST':
         total_hours = request.form.get('total_hours')
         if total_hours == '0':
@@ -191,11 +198,16 @@ def review_schedule_student():
                 new_schedule = submittedSchedules(student_vip_id = current_user.vip_id, advisor_vip_id = current_user.advisor_id, semester = semester, status = 'Needs Review')
                 db.session.add(new_schedule)
                 db.session.commit()
+                flash('Your schedule has been submitted to your advisor for feedback!', 'dark')
             else:
-                schedule.status = 'Changes made'
-                schedule.advisor_feedback = None
-                db.session.commit()
-            flash('Your schedule has been submitted to your advisor for feedback!', 'dark')
+                schedule = submittedSchedules.query.filter_by(student_vip_id = current_user.vip_id, semester = semester).first()
+                if schedule is None:
+                    schedule.status = 'Changes made'
+                    schedule.advisor_feedback = None
+                    db.session.commit()
+                    flash('Your schedule has been submitted to your advisor for feedback!', 'dark')
+                else:
+                    flash('Error: You cannot submit your schedule again until your advisor provides feedback.', 'danger')
         return redirect(url_for('review_schedule_student'))
     return render_template('review-schedule.html', classes=list(classes), hours=hours.first(), semester=session['term'], status=status.first(), feedback=feedback.first())
 
