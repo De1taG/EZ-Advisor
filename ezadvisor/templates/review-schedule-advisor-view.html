@@ -99,18 +99,18 @@
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div class="modal-body">
-            <form>
+          <form action="" method="POST" role="form">
+            <div class="modal-body">
               <div class="form-group">
                 <label for="feedback-message">Tell the student why their schedule was denied...</label>
-                <textarea class="form-control" id="feedback-message" rows="6"></textarea>
+                <textarea name="feedback" class="form-control" id="feedback-message" rows="6"></textarea>
               </div>
-            </form>
-          </div>
-          <div class="modal-footer" id="feedback-modal-footer">
-            <button type="button" class="btn feedback-modal-button" data-dismiss="modal">Cancel</button>
-            <button type="button" class="btn feedback-modal-button" data-dismiss="modal" data-toggle="modal" data-target="#feedbackSentModal">Send</button>
-          </div>
+            </div>
+            <div class="modal-footer" id="feedback-modal-footer">
+              <button type="button" class="btn feedback-modal-button" data-dismiss="modal">Cancel</button>
+              <input type="submit" name="btn" class="btn feedback-modal-button" value="Send" />
+            </div>
+          </form>
         </div>
       </div>
     </div>

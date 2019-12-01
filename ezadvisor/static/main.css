@@ -436,6 +436,16 @@ html.is-leaving .transition-fade {
 
 /*-----------COMPLETED-SCHEDULE.HTML/REVIEW-SCHEDULE.HTML-------------*/
 
+#view-feedback-link {
+    color: white;
+    text-decoration: underline;
+    font-size: 22px;
+}
+
+#status-header {
+    display: inline-block;
+}
+
 #schedule-container {
     display: none;
 }

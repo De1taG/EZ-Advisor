@@ -82,7 +82,10 @@
           <div class="row">
             <div class="col">
               <h1 id="review-schedule-header" class="page-header mt-5">Review Schedule</h1>
-              <h4 class="page-header my-4">Status: {{ status[0] }}</h4> 
+              <h4 id="status-header" class="page-header my-4 mr-4">Status: {{ status[0] }}</h4> 
+              {% if status[0] == 'Feedback Submitted' %}
+              <a href="#" id="view-feedback-link" data-toggle="modal" data-target="#feedbackModal">View</a> 
+              {% endif %}
             </div>
           </div>
           <form action="" method="POST" role="form">
@@ -116,7 +119,7 @@
     </div>
     <!--Schedule end-->
 
-    <!-- Modal -->
+    <!-- Delete Modal -->
   {% for i in classes %}
   <div class="modal fade" id="deleteModal{{ i.crn }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
@@ -135,6 +138,26 @@
       </div>
     </div>
     {% endfor %}
+
+  <!-- Feedback Modal -->
+  <div class="modal fade" id="feedbackModal" tabindex="-1" role="dialog" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Advisor Feedback</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p id="advisor-feedback">{{ feedback[0] }}</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
