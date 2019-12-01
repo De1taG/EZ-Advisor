@@ -23,6 +23,8 @@ class submittedSchedules(db.Model):
     submit_datetime = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
     status = db.Column(db.String(30), primary_key=True, default='Not submitted')
     advisor_feedback = db.Column(db.String(1000))
+    student_signed = db.Column(db.String(20), default='No')
+    advisor_signed = db.Column(db.String(20), default='No')
     
 
 class proposedSchedule(db.Model):

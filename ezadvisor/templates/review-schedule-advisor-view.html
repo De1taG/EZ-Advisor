@@ -77,7 +77,7 @@
           <form action="" method="POST" role="form">
             <div class="row mt-4">
               <div class="col">
-                <input class="btn review-schedule-button" type="submit" name="btn" value="APPROVE">
+                <button type="button" class="btn review-schedule-button" data-toggle="modal" data-target="#approvalModal">APPROVE</button>
               </div>
               <div class="col">
                 <button type="button" class="btn review-schedule-button" data-toggle="modal" data-target="#feedbackModal">DENY</button>
@@ -115,6 +115,33 @@
       </div>
     </div>
     <!--Feedbak modal end-->
+
+    <!-- Approval modal start -->
+    <div class="modal fade" id="approvalModal" tabindex="-1" role="dialog" aria-labelledby="approvalModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title text-center" id="approvalModalLabel">Approve Schedule</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form action="" method="POST" role="form">
+              <div class="modal-body">
+                <div class="form-group">
+                  <label class="mb-3" for="advisor-signature">Type your name below to electronically sign the schedule</label>
+                  <input type="text" name="advisor-signature" class="form-control" placeholder="Signature" id="advisor-signature" />
+                </div>
+              </div>
+              <div class="modal-footer" id="approval-modal-footer">
+                <button type="button" class="btn approval-modal-button" data-dismiss="modal">Cancel</button>
+                <input type="submit" name="btn" class="btn approval-modal-button" value="Sign" />
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <!--Feedbak modal end-->
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

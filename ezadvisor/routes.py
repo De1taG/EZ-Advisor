@@ -257,11 +257,16 @@ def review_schedule_advisor():
         where proposed_schedule.student_vip_id = :val1 and proposed_schedule.semester= :val2', \
         {'val1': session['student_vip_id'], 'val2': session['semester']})
     if request.method == 'POST':
-        if request.form['btn'] == 'APPROVE':
-            schedule = submittedSchedules.query.filter_by(student_vip_id=student_vip_id).first()
-            schedule.status = 'Approved'
-            db.session.commit()
-            flash('Schedule approved!', 'dark')
+        if request.form['btn'] == 'Sign':
+            signature = request.form.get('advisor-signature')
+            if signature == '':
+                flash('Error: You must sign your name to approve the schedule', 'danger')
+            else:
+                schedule = submittedSchedules.query.filter_by(student_vip_id=student_vip_id).first()
+                schedule.status = 'Approved'
+                schedule.advisor_signed = 'Yes'
+                db.session.commit()
+                flash('Schedule approved!', 'dark')
         elif request.form['btn'] == 'Send':
             feedback = request.form.get('feedback')
             schedule = submittedSchedules.query.filter_by(student_vip_id=student_vip_id).first()

@@ -525,18 +525,18 @@ hr {
 
 /*------------REVIEW-SCHEDULE-ADVISOR-VIEW.HTML------------------------*/
 
-#feedback-modal-footer {
+#feedback-modal-footer, #approval-modal-footer {
     justify-content: space-around;
 }
 
-.feedback-modal-button {
+.feedback-modal-button, .approval-modal-button {
     background-color: #07CB8B;
     color: white;
     width: 30%;
     height: 60%;
 }
 
-.feedback-modal-button:hover {
+.feedback-modal-button:hover, .approval-modal-button:hover {
     background-color: white;
     color: #07CB8B;
 }
