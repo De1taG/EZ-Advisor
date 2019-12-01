@@ -153,7 +153,7 @@ def completed_schedule():
                 db.session.commit()
                 flash('Your schedule has been submitted to your advisor for feedback!', 'dark')
             else:
-                schedule = submittedSchedules.query.filter_by(student_vip_id = current_user.vip_id, semester = semester).first()
+                schedule = submittedSchedules.query.filter_by(student_vip_id = current_user.vip_id, semester = semester, status='Needs Review').first()
                 if schedule is None:
                     schedule.status = 'Changes made'
                     schedule.advisor_feedback = None
@@ -200,7 +200,7 @@ def review_schedule_student():
                 db.session.commit()
                 flash('Your schedule has been submitted to your advisor for feedback!', 'dark')
             else:
-                schedule = submittedSchedules.query.filter_by(student_vip_id = current_user.vip_id, semester = semester).first()
+                schedule = submittedSchedules.query.filter_by(student_vip_id = current_user.vip_id, semester = semester, status='Needs Review').first()
                 if schedule is None:
                     schedule.status = 'Changes made'
                     schedule.advisor_feedback = None
