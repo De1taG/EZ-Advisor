@@ -491,6 +491,15 @@ html.is-leaving .transition-fade {
 hr {
     border: 1px solid #969393;
 }
+
+.approve-schedule-button-student {
+    background-color: white;
+    color: #07CB8B;
+    width: 40%;
+    font-size: 22px;
+}
+
+
 /*-------------------------------------------------------*/
 
 

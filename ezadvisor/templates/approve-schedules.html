@@ -51,10 +51,10 @@
                   <span class="approve-schedules-header"><Strong>Name</Strong></span><!--This does not need to be dynamic-->
                 </div>
                 <div class="col">
-                  <span class="approve-schedules-header"><Strong>Submit Date</Strong></span><!--This does not need to be dynamic-->
+                  <span class="approve-schedules-header"><Strong>Semester</Strong></span><!--This does not need to be dynamic-->
                 </div>
                 <div class="col">
-                  <span class="approve-schedules-header"><Strong>Semester</Strong></span><!--This does not need to be dynamic-->
+                  <span class="approve-schedules-header"><Strong>Submit Date</Strong></span><!--This does not need to be dynamic-->
                 </div>
                 <div class="col">
                   <span class="approve-schedules-header"><Strong>Status</Strong></span><!--This does not need to be dynamic-->
@@ -76,11 +76,11 @@
                     <span class="student-info">{{ i.name }}</span>
                   </div>
                   <div class="col">
-                    <span class="student-info">{{ i.submitted_date}}</span>
-                  </div>
-                  <div class="col">
                     <input type="hidden" name="view_schedule_semester" value= "{{ i.semester }}" />
                     <span class="student-info">{{ i.semester }}</span>
+                  </div>
+                  <div class="col">
+                    <span class="student-info">{{ i.submitted_date}}</span>
                   </div>
                   <div class="col">
                     <span class="student-info">{{ i.status }}</span>

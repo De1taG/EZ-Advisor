@@ -135,6 +135,7 @@ def completed_schedule():
     feedback = db.session.execute('SELECT (case when advisor_feedback is null then "No feedback" else advisor_feedback end) \
         as advisor_feedback FROM submitted_schedules where student_vip_id = :val1 and semester= :val2', \
         {'val1': session['student_vip_id'], 'val2': session['term']})
+    semester = session['term']
     if request.method == 'POST':
         total_hours = request.form.get('total_hours')
         if total_hours == '0':
@@ -144,8 +145,7 @@ def completed_schedule():
             course = proposedSchedule.query.filter_by(student_vip_id=current_user.vip_id, course_crn=course_crn, semester=session['term']).delete()
             db.session.commit()
             flash('Class has been deleted.', 'dark')
-        else:
-            semester = session['term']
+        elif request.form['btn'] == 'SUBMIT TO ADVISOR':
             schedule = submittedSchedules.query.filter_by(student_vip_id = current_user.vip_id, semester = semester).first()
             if schedule is None: 
                 new_schedule = submittedSchedules(student_vip_id = current_user.vip_id, advisor_vip_id = current_user.advisor_id, semester = semester, status = 'Needs Review')
@@ -155,12 +155,23 @@ def completed_schedule():
             else:
                 schedule = submittedSchedules.query.filter_by(student_vip_id = current_user.vip_id, semester = semester, status='Needs Review').first()
                 if schedule is None:
+                    schedule = submittedSchedules.query.filter_by(student_vip_id = current_user.vip_id, semester = semester).first()
                     schedule.status = 'Changes made'
                     schedule.advisor_feedback = None
                     db.session.commit()
                     flash('Your schedule has been submitted to your advisor for feedback!', 'dark')
                 else:
                     flash('Error: You cannot submit your schedule again until your advisor provides feedback.', 'danger')
+        elif request.form['btn'] == 'Sign':
+            signature = request.form.get('student-signature')
+            if signature == '':
+                flash('Error: You must sign your name.', 'danger')
+            else:
+                schedule = submittedSchedules.query.filter_by(student_vip_id=current_user.vip_id, semester=session['term']).first()
+                schedule.student_signed = 'Yes'
+                schedule.status = 'Student Signed'
+                db.session.commit()
+                flash('Schedule signed!', 'dark')
         return redirect(url_for('review_schedule_student'))
     return render_template('completed-schedule.html', classes=list(classes), hours=hours.first(), semester=session['term'], status=status.first(), feedback=feedback.first())
 
@@ -182,6 +193,7 @@ def review_schedule_student():
     feedback = db.session.execute('SELECT (case when advisor_feedback is null then "No feedback" else advisor_feedback end) \
         as advisor_feedback FROM submitted_schedules where student_vip_id = :val1 and semester= :val2', \
         {'val1': session['student_vip_id'], 'val2': session['term']})
+    semester = session['term']
     if request.method == 'POST':
         total_hours = request.form.get('total_hours')
         if total_hours == '0':
@@ -191,8 +203,7 @@ def review_schedule_student():
             course = proposedSchedule.query.filter_by(student_vip_id=current_user.vip_id, course_crn=course_crn, semester=session['term']).delete()
             db.session.commit()
             flash('Class has been deleted.', 'dark')
-        else:
-            semester = session['term']
+        elif request.form['btn'] == 'SUBMIT TO ADVISOR':
             schedule = submittedSchedules.query.filter_by(student_vip_id = current_user.vip_id, semester = semester).first()
             if schedule is None: 
                 new_schedule = submittedSchedules(student_vip_id = current_user.vip_id, advisor_vip_id = current_user.advisor_id, semester = semester, status = 'Needs Review')
@@ -202,12 +213,23 @@ def review_schedule_student():
             else:
                 schedule = submittedSchedules.query.filter_by(student_vip_id = current_user.vip_id, semester = semester, status='Needs Review').first()
                 if schedule is None:
+                    schedule = submittedSchedules.query.filter_by(student_vip_id = current_user.vip_id, semester = semester).first()
                     schedule.status = 'Changes made'
                     schedule.advisor_feedback = None
                     db.session.commit()
                     flash('Your schedule has been submitted to your advisor for feedback!', 'dark')
                 else:
                     flash('Error: You cannot submit your schedule again until your advisor provides feedback.', 'danger')
+        elif request.form['btn'] == 'Sign':
+            signature = request.form.get('student-signature')
+            if signature == '':
+                flash('Error: You must sign your name.', 'danger')
+            else:
+                schedule = submittedSchedules.query.filter_by(student_vip_id=current_user.vip_id, semester=session['term']).first()
+                schedule.student_signed = 'Yes'
+                schedule.status = 'Student Signed'
+                db.session.commit()
+                flash('Schedule signed!', 'dark')
         return redirect(url_for('review_schedule_student'))
     return render_template('review-schedule.html', classes=list(classes), hours=hours.first(), semester=session['term'], status=status.first(), feedback=feedback.first())
 
@@ -262,17 +284,20 @@ def review_schedule_advisor():
             if signature == '':
                 flash('Error: You must sign your name to approve the schedule', 'danger')
             else:
-                schedule = submittedSchedules.query.filter_by(student_vip_id=student_vip_id).first()
+                schedule = submittedSchedules.query.filter_by(student_vip_id=student_vip_id, semester=semester).first()
                 schedule.status = 'Approved'
                 schedule.advisor_signed = 'Yes'
                 db.session.commit()
                 flash('Schedule approved!', 'dark')
         elif request.form['btn'] == 'Send':
             feedback = request.form.get('feedback')
-            schedule = submittedSchedules.query.filter_by(student_vip_id=student_vip_id).first()
-            schedule.status = 'Feedback Submitted'
-            schedule.advisor_feedback = feedback
-            db.session.commit()
-            flash('Feedback submitted!', 'dark')
+            if feedback == '':
+                flash('Error: You must provide feedback to the student', 'danger')
+            else: 
+                schedule = submittedSchedules.query.filter_by(student_vip_id=student_vip_id, semester=semester).first()
+                schedule.status = 'Feedback Submitted'
+                schedule.advisor_feedback = feedback
+                db.session.commit()
+                flash('Feedback submitted!', 'dark')
         return redirect(url_for('review_schedule_advisor'))
     return render_template('review-schedule-advisor-view.html', classes=list(classes), hours=hours.first(), student_name=session['student_name'], semester = semester)
