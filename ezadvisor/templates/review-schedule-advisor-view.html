@@ -57,7 +57,8 @@
             </div>
           <div class="row">
             <div class="col">
-              <h1 id="review-schedule-header" class="page-header my-5">{{ student_name }}'s Schedule</h1>
+              <h1 id="review-schedule-header" class="page-header mt-4">{{ student_name }}'s Schedule</h1>
+              <h4 id="status-header" class="page-header my-4 mr-4">Status: {{ status[0] }}</h4>
             </div>
           </div>
           <div class="row">
@@ -76,12 +77,14 @@
           </div>
           <form action="" method="POST" role="form">
             <div class="row mt-4">
+              {% if status[0] == 'Needs review' or status[0] == 'Feedback submitted' or status[0] == 'Changes made' %}
               <div class="col">
                 <button type="button" class="btn review-schedule-button" data-toggle="modal" data-target="#approvalModal">APPROVE</button>
               </div>
               <div class="col">
                 <button type="button" class="btn review-schedule-button" data-toggle="modal" data-target="#feedbackModal">DENY</button>
               </div>
+              {% endif %}
             </div>
           </form>
         </div>

@@ -83,7 +83,9 @@
                   {% for i in classes %}
                   {{ i.course_id|string + ' - ' + i.section_num|string + ' - ' + i.start_time + '-' + i.end_time + ' - ' + i.day }} 
                   &nbsp; &nbsp;
+                  {% if status[0] == 'Not submitted' or status[0] == 'Feedback submitted' %}
                   <a href="#" data-toggle="modal" data-target="#deleteModal{{ i.crn }}">Delete</a> 
+                  {% endif %}
                   <br>
                   {% endfor %}
                 </p>
@@ -93,11 +95,11 @@
               </div>
             </div>
             <div class="row mt-4">
-              {% if status[0] == 'Approved' %}
+              {% if status[0] == 'Advisor approved' %}
               <div class="col">
                 <button type="button" class="btn approve-schedule-button-student" data-toggle="modal" data-target="#approvalModal">SIGN</button>
               </div>
-              {% elif status[0] == 'Student Signed' %}
+              {% elif status[0] == 'Student signed' or status[0] == 'Needs review' or status[0] == 'Changes made' %}
               {% else %}
               <div class="col">
                 <input type="submit" name="btn" class="btn review-schedule-button" value="SUBMIT TO ADVISOR">

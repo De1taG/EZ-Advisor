@@ -40,18 +40,29 @@ def logout():
 def get_started():
     return render_template('get-started.html')
 
+@app.route('/access-denied')
+@login_required
+def access_denied():
+    return render_template('access-denied.html')
+
 
 ############# Student pages ##############
 
 @app.route('/build-schedule')
 @login_required
 def build_schedule():
+    student = Student.query.filter_by(vip_id=current_user.vip_id).first()
+    if student is None:
+        return redirect(url_for('access_denied'))
     return render_template('build-schedule.html')
 
 
 @app.route('/select-campus', methods=['GET', 'POST'])
 @login_required
 def select_campus():
+    student = Student.query.filter_by(vip_id=current_user.vip_id).first()
+    if student is None:
+        return redirect(url_for('access_denied'))
     campuses = Campus.query.all()
     if request.method == 'POST':
         session['campus'] = request.form.get('campus')
@@ -62,6 +73,9 @@ def select_campus():
 @app.route('/select-term', methods=['GET', 'POST'])
 @login_required
 def select_term():
+    student = Student.query.filter_by(vip_id=current_user.vip_id).first()
+    if student is None:
+        return redirect(url_for('access_denied'))
     terms = Semester.query.all()
     if request.method == 'POST':
         session['term'] = request.form.get('term')
@@ -72,6 +86,9 @@ def select_term():
 @app.route('/select-subject', methods=['GET', 'POST'])
 @login_required
 def select_subject():
+    student = Student.query.filter_by(vip_id=current_user.vip_id).first()
+    if student is None:
+        return redirect(url_for('access_denied'))
     subject = Major.query.all()
     if request.method == 'POST':
         session['subject'] = request.form.get('subject')
@@ -82,6 +99,9 @@ def select_subject():
 @app.route('/search-results', methods=['GET', 'POST'])
 @login_required
 def search_results():
+    student = Student.query.filter_by(vip_id=current_user.vip_id).first()
+    if student is None:
+        return redirect(url_for('access_denied'))
     if request.method == 'POST':
         session['course'] = request.form.get('course')
         return redirect(url_for('class_sections'))
@@ -95,20 +115,30 @@ def search_results():
 @app.route('/class-sections', methods=['GET', 'POST'])
 @login_required
 def class_sections():
+    student = Student.query.filter_by(vip_id=current_user.vip_id).first()
+    if student is None:
+        return redirect(url_for('access_denied'))
+    status = db.session.execute('select case when count(student_vip_id) = 0 then "Not submitted" else status end as status \
+        from submitted_schedules where student_vip_id = :val1 and semester = :val2', \
+            {'val1': current_user.vip_id, 'val2': session['term']})
+    status = status.first()
     if request.method == 'POST':
         crn = request.form.get('course_crn')
         semester = request.form.get('course_semester')
-        already_added = db.session.execute('select count(1) from proposed_schedule where student_vip_id = :val1 \
-        and semester = :val2 and course_crn = :val3', \
-        {'val1': current_user.vip_id, 'val2': semester, 'val3': crn})
-        already_added = proposedSchedule.query.filter_by(student_vip_id = current_user.vip_id, semester = semester, course_crn = crn).first()
-        if already_added is None:
-            new_course = proposedSchedule(student_vip_id = current_user.vip_id, course_crn = crn, semester=semester)
-            db.session.add(new_course)
-            db.session.commit()
-            flash('Course successfully added!', 'dark')
+        if (status[0] == 'Needs review' or status[0] == 'Changes made' or status[0] == 'Advisor approved' or status[0] == 'Student signed'):
+            flash('Error: You cannot add more courses at this stage.', 'danger')
         else:
-            flash('Error: You have already added this course to your schedule', 'danger')
+            already_added = db.session.execute('select count(1) from proposed_schedule where student_vip_id = :val1 \
+            and semester = :val2 and course_crn = :val3', \
+            {'val1': current_user.vip_id, 'val2': semester, 'val3': crn})
+            already_added = proposedSchedule.query.filter_by(student_vip_id = current_user.vip_id, semester = semester, course_crn = crn).first()
+            if already_added is None:
+                new_course = proposedSchedule(student_vip_id = current_user.vip_id, course_crn = crn, semester=semester)
+                db.session.add(new_course)
+                db.session.commit()
+                flash('Course successfully added!', 'dark')
+            else:
+                flash('Error: You have already added this course to your schedule', 'danger')
         return redirect(url_for('class_sections'))
     course = session['course']
     course_id = course[0 : 9]
@@ -122,6 +152,9 @@ def class_sections():
 @app.route('/completed-schedule', methods=['GET', 'POST'])
 @login_required
 def completed_schedule():
+    student = Student.query.filter_by(vip_id=current_user.vip_id).first()
+    if student is None:
+        return redirect(url_for('access_denied'))
     classes = db.session.execute('SELECT courses.* FROM proposed_schedule \
         left JOIN courses on proposed_schedule.course_crn = courses.crn \
         where proposed_schedule.student_vip_id = :val1 and proposed_schedule.semester= :val2', \
@@ -131,7 +164,8 @@ def completed_schedule():
         where proposed_schedule.student_vip_id = :val1 and proposed_schedule.semester= :val2', \
         {'val1': current_user.vip_id, 'val2': session['term']})
     status = db.session.execute('select case when count(student_vip_id) = 0 then "Not submitted" else status end as status \
-        from submitted_schedules where student_vip_id = :val1', {'val1': current_user.vip_id})
+        from submitted_schedules where student_vip_id = :val1 and semester = :val2', \
+            {'val1': current_user.vip_id, 'val2': session['term']})
     feedback = db.session.execute('SELECT (case when advisor_feedback is null then "No feedback" else advisor_feedback end) \
         as advisor_feedback FROM submitted_schedules where student_vip_id = :val1 and semester= :val2', \
         {'val1': session['student_vip_id'], 'val2': session['term']})
@@ -148,12 +182,12 @@ def completed_schedule():
         elif request.form['btn'] == 'SUBMIT TO ADVISOR':
             schedule = submittedSchedules.query.filter_by(student_vip_id = current_user.vip_id, semester = semester).first()
             if schedule is None: 
-                new_schedule = submittedSchedules(student_vip_id = current_user.vip_id, advisor_vip_id = current_user.advisor_id, semester = semester, status = 'Needs Review')
+                new_schedule = submittedSchedules(student_vip_id = current_user.vip_id, advisor_vip_id = current_user.advisor_id, semester = semester, status = 'Needs review')
                 db.session.add(new_schedule)
                 db.session.commit()
                 flash('Your schedule has been submitted to your advisor for feedback!', 'dark')
             else:
-                schedule = submittedSchedules.query.filter_by(student_vip_id = current_user.vip_id, semester = semester, status='Needs Review').first()
+                schedule = submittedSchedules.query.filter_by(student_vip_id = current_user.vip_id, semester = semester, status='Needs review').first()
                 if schedule is None:
                     schedule = submittedSchedules.query.filter_by(student_vip_id = current_user.vip_id, semester = semester).first()
                     schedule.status = 'Changes made'
@@ -169,7 +203,7 @@ def completed_schedule():
             else:
                 schedule = submittedSchedules.query.filter_by(student_vip_id=current_user.vip_id, semester=session['term']).first()
                 schedule.student_signed = 'Yes'
-                schedule.status = 'Student Signed'
+                schedule.status = 'Student signed'
                 db.session.commit()
                 flash('Schedule signed!', 'dark')
         return redirect(url_for('review_schedule_student'))
@@ -179,6 +213,9 @@ def completed_schedule():
 @app.route('/review-schedule', methods=['GET', 'POST'])
 @login_required
 def review_schedule_student():
+    student = Student.query.filter_by(vip_id=current_user.vip_id).first()
+    if student is None:
+        return redirect(url_for('access_denied'))
     classes = db.session.execute('SELECT courses.* FROM proposed_schedule \
         left JOIN courses on proposed_schedule.course_crn = courses.crn \
         where proposed_schedule.student_vip_id = :val1 and proposed_schedule.semester= :val2', \
@@ -189,7 +226,8 @@ def review_schedule_student():
         where proposed_schedule.student_vip_id = :val1 and proposed_schedule.semester= :val2', \
         {'val1': current_user.vip_id, 'val2': session['term']})
     status = db.session.execute('select case when count(student_vip_id) = 0 then "Not submitted" else status end as status \
-        from submitted_schedules where student_vip_id = :val1', {'val1': current_user.vip_id})
+        from submitted_schedules where student_vip_id = :val1 and semester = :val2', \
+            {'val1': current_user.vip_id, 'val2': session['term']})
     feedback = db.session.execute('SELECT (case when advisor_feedback is null then "No feedback" else advisor_feedback end) \
         as advisor_feedback FROM submitted_schedules where student_vip_id = :val1 and semester= :val2', \
         {'val1': session['student_vip_id'], 'val2': session['term']})
@@ -206,12 +244,12 @@ def review_schedule_student():
         elif request.form['btn'] == 'SUBMIT TO ADVISOR':
             schedule = submittedSchedules.query.filter_by(student_vip_id = current_user.vip_id, semester = semester).first()
             if schedule is None: 
-                new_schedule = submittedSchedules(student_vip_id = current_user.vip_id, advisor_vip_id = current_user.advisor_id, semester = semester, status = 'Needs Review')
+                new_schedule = submittedSchedules(student_vip_id = current_user.vip_id, advisor_vip_id = current_user.advisor_id, semester = semester, status = 'Needs review')
                 db.session.add(new_schedule)
                 db.session.commit()
                 flash('Your schedule has been submitted to your advisor for feedback!', 'dark')
             else:
-                schedule = submittedSchedules.query.filter_by(student_vip_id = current_user.vip_id, semester = semester, status='Needs Review').first()
+                schedule = submittedSchedules.query.filter_by(student_vip_id = current_user.vip_id, semester = semester, status='Needs review').first()
                 if schedule is None:
                     schedule = submittedSchedules.query.filter_by(student_vip_id = current_user.vip_id, semester = semester).first()
                     schedule.status = 'Changes made'
@@ -227,7 +265,7 @@ def review_schedule_student():
             else:
                 schedule = submittedSchedules.query.filter_by(student_vip_id=current_user.vip_id, semester=session['term']).first()
                 schedule.student_signed = 'Yes'
-                schedule.status = 'Student Signed'
+                schedule.status = 'Student signed'
                 db.session.commit()
                 flash('Schedule signed!', 'dark')
         return redirect(url_for('review_schedule_student'))
@@ -237,6 +275,9 @@ def review_schedule_student():
 @app.route('/advisor-info', methods=['GET', 'POST'])
 @login_required
 def advisor_info():
+    student = Student.query.filter_by(vip_id=current_user.vip_id).first()
+    if student is None:
+        return redirect(url_for('access_denied'))
     advisor = db.session.execute('SELECT * FROM advisor WHERE vip_id = :val', {'val': current_user.advisor_id})
     return render_template('advisor-info.html', advisor=advisor)
 
@@ -266,6 +307,9 @@ def approve_schedules():
 @app.route('/review-schedule-advisor-view', methods=['GET', 'POST'])
 @login_required
 def review_schedule_advisor():
+    advisor = Advisor.query.filter_by(vip_id=current_user.vip_id).first()
+    if advisor is None:
+        return redirect(url_for('access_denied'))
     student_name = session['student_name']
     semester = session['semester']
     student_vip_id = session['student_vip_id']
@@ -278,6 +322,9 @@ def review_schedule_advisor():
         left JOIN courses on proposed_schedule.course_crn = courses.crn \
         where proposed_schedule.student_vip_id = :val1 and proposed_schedule.semester= :val2', \
         {'val1': session['student_vip_id'], 'val2': session['semester']})
+    status = db.session.execute('select case when count(student_vip_id) = 0 then "Not submitted" else status end as status \
+        from submitted_schedules where student_vip_id = :val1 and semester = :val2', \
+            {'val1': session['student_vip_id'], 'val2': session['semester']})
     if request.method == 'POST':
         if request.form['btn'] == 'Sign':
             signature = request.form.get('advisor-signature')
@@ -285,7 +332,7 @@ def review_schedule_advisor():
                 flash('Error: You must sign your name to approve the schedule', 'danger')
             else:
                 schedule = submittedSchedules.query.filter_by(student_vip_id=student_vip_id, semester=semester).first()
-                schedule.status = 'Approved'
+                schedule.status = 'Advisor approved'
                 schedule.advisor_signed = 'Yes'
                 db.session.commit()
                 flash('Schedule approved!', 'dark')
@@ -295,9 +342,9 @@ def review_schedule_advisor():
                 flash('Error: You must provide feedback to the student', 'danger')
             else: 
                 schedule = submittedSchedules.query.filter_by(student_vip_id=student_vip_id, semester=semester).first()
-                schedule.status = 'Feedback Submitted'
+                schedule.status = 'Feedback submitted'
                 schedule.advisor_feedback = feedback
                 db.session.commit()
                 flash('Feedback submitted!', 'dark')
         return redirect(url_for('review_schedule_advisor'))
-    return render_template('review-schedule-advisor-view.html', classes=list(classes), hours=hours.first(), student_name=session['student_name'], semester = semester)
+    return render_template('review-schedule-advisor-view.html', classes=list(classes), hours=hours.first(), student_name=session['student_name'], semester = semester, status=status.first())
