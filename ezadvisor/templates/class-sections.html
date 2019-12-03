@@ -46,6 +46,7 @@
           <div class="col-11 col-sm-10 col-md-9 col-lg-8 col-xl-7 mx-auto text-center">
             <div class="row">
               <div class="col">
+                <!--Display error messages to the student-->
                 {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                   {% for category, message in messages %}
@@ -84,6 +85,7 @@
             <div class="row class-section-row">
               <div class="col">
                 {% for i in sections %}
+                <!--Open the class information modal when they select a course section-->
                 <button type="button" class="btn btn-block select-class-section-button" data-toggle="modal" data-target="#classInfoModal{{ i.crn }}">
                   <div class="row">
                     <div class="col">
@@ -111,38 +113,38 @@
       </div>
       <!--Class sections end-->
 
-      <!--Modal start-->
+      <!--Class information modal start-->
       <!--This modal dialog appears whenever the student clicks on the class section. It shows details about the course and 
       it contains the button that allows the student to add the course to their proposed schedule.-->
       {% for section in sections %}
       <div class="modal fade" id="classInfoModal{{ section.crn }}" tabindex="-1" role="dialog" aria-hidden="true">
-          <div class="modal-dialog" role="document">
-            <div id="class-sections-modal-content" class="modal-content">
-              <form action="#" method="POST" role="form" id="addCourseForm">
-                <div id="class-sections-modal-body" class="modal-body">
-                  <p id="class-sections-modal-text">
-                    Course: {{ section.course_id }}<br>
-                    Title: {{ section.course_title }}<br>
-                    <input type="hidden" name="course_crn" value= "{{ section.crn }}" />
-                    CRN: {{ section.crn }}<br>
-                    Sect: {{ section.section_num }}<br>
-                    Instructor: {{ section.professor_name }}<br>
-                    <input type="hidden" name="course_semester" value= "{{ section.semester }}" />
-                    Semester: {{ section.semester }}<br>
-                    Days: {{ section.day }}<br>
-                    Time: {{ section.start_time }} - {{ section.end_time }}<br>
-                  </p>
-                </div>
-                <div id="class-sections-modal-footer" class="modal-footer">
-                  <input type="submit" id="class-info-modal-button-add" class="btn class-sections-modal-button" value="ADD">
-                  <button type="button" id="class-info-modal-button-cancel" class="btn class-sections-modal-button" data-dismiss="modal">CANCEL</button>
-                </div>
-              </form>
-            </div>
+        <div class="modal-dialog" role="document">
+          <div id="class-sections-modal-content" class="modal-content">
+            <form action="#" method="POST" role="form" id="addCourseForm">
+              <div id="class-sections-modal-body" class="modal-body">
+                <p id="class-sections-modal-text">
+                  Course: {{ section.course_id }}<br>
+                  Title: {{ section.course_title }}<br>
+                  <input type="hidden" name="course_crn" value= "{{ section.crn }}" />
+                  CRN: {{ section.crn }}<br>
+                  Sect: {{ section.section_num }}<br>
+                  Instructor: {{ section.professor_name }}<br>
+                  <input type="hidden" name="course_semester" value= "{{ section.semester }}" />
+                  Semester: {{ section.semester }}<br>
+                  Days: {{ section.day }}<br>
+                  Time: {{ section.start_time }} - {{ section.end_time }}<br>
+                </p>
+              </div>
+              <div id="class-sections-modal-footer" class="modal-footer">
+                <input type="submit" id="class-info-modal-button-add" class="btn class-sections-modal-button" value="ADD">
+                <button type="button" id="class-info-modal-button-cancel" class="btn class-sections-modal-button" data-dismiss="modal">CANCEL</button>
+              </div>
+            </form>
           </div>
         </div>
-        <!--modal end-->
-        {% endfor %}
+      </div>
+      <!--modal end-->
+      {% endfor %}
 
           
       <!--Footer start-->
