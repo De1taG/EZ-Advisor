@@ -15,6 +15,7 @@ def login():
         return redirect(url_for('get_started'))
     form = LoginForm()
     if form.validate_on_submit():
+        #User must either be a student or an advisor
         student = Student.query.filter_by(vip_id=form.username.data).first()
         advisor = Advisor.query.filter_by(vip_id=form.username.data).first()
         if (student is None or not student.check_password(form.password.data)) and (advisor is None or not advisor.check_password(form.password.data)):
@@ -39,6 +40,8 @@ def logout():
 @login_required
 def get_started():
     if request.method == 'POST':
+        #Both students and advisors will first be directed to this page after logging in
+        #and then they will be directed to two different pages
         student = Student.query.filter_by(vip_id=current_user.vip_id).first()
         if student is None:
             return redirect(url_for('approve_schedules'))
@@ -49,6 +52,8 @@ def get_started():
 @app.route('/access-denied')
 @login_required
 def access_denied():
+    #Student will be directed to this page if they try to access an advisor page
+    #Advisor will be directed to this page if they try to access a student page
     return render_template('access-denied.html')
 
 
@@ -57,6 +62,7 @@ def access_denied():
 @app.route('/build-schedule')
 @login_required
 def build_schedule():
+    #Checks to make sure that the current user is a student, not an advisor. 
     student = Student.query.filter_by(vip_id=current_user.vip_id).first()
     if student is None:
         return redirect(url_for('access_denied'))
@@ -66,11 +72,13 @@ def build_schedule():
 @app.route('/select-campus', methods=['GET', 'POST'])
 @login_required
 def select_campus():
+    #Checks to make sure that the current user is a student, not an advisor. 
     student = Student.query.filter_by(vip_id=current_user.vip_id).first()
     if student is None:
         return redirect(url_for('access_denied'))
     campuses = Campus.query.all()
     if request.method == 'POST':
+        #Set campus as a session variable so that the variable will persist across pages and functions
         session['campus'] = request.form.get('campus')
         return redirect(url_for('select_term'))
     return render_template('select-campus.html', campuses=campuses)
@@ -79,11 +87,13 @@ def select_campus():
 @app.route('/select-term', methods=['GET', 'POST'])
 @login_required
 def select_term():
+    #Checks to make sure that the current user is a student, not an advisor. 
     student = Student.query.filter_by(vip_id=current_user.vip_id).first()
     if student is None:
         return redirect(url_for('access_denied'))
     terms = Semester.query.all()
     if request.method == 'POST':
+        #Set term as a session variable so that the variable will persist across pages and functions
         session['term'] = request.form.get('term')
         return redirect(url_for('select_subject'))
     return render_template('select-term.html', terms=terms)
@@ -92,11 +102,13 @@ def select_term():
 @app.route('/select-subject', methods=['GET', 'POST'])
 @login_required
 def select_subject():
+    #Checks to make sure that the current user is a student, not an advisor. 
     student = Student.query.filter_by(vip_id=current_user.vip_id).first()
     if student is None:
         return redirect(url_for('access_denied'))
     subject = Major.query.all()
     if request.method == 'POST':
+        #Set subject as a session variable so that the variable will persist across pages and functions
         session['subject'] = request.form.get('subject')
         return redirect(url_for('search_results'))
     return render_template('select-subject.html', subject=subject)
@@ -105,12 +117,16 @@ def select_subject():
 @app.route('/search-results', methods=['GET', 'POST'])
 @login_required
 def search_results():
+    #Checks to make sure that the current user is a student, not an advisor. 
     student = Student.query.filter_by(vip_id=current_user.vip_id).first()
     if student is None:
         return redirect(url_for('access_denied'))
     if request.method == 'POST':
+        #Set course as a session variable so that the variable will persist across pages and functions
         session['course'] = request.form.get('course')
         return redirect(url_for('class_sections'))
+    #Select all courses that match the chosen campus and term. Limit the displayed courses to the one the student has not already
+    #taken in the past and for which the student received at least a 'C' as the grade.
     courses = db.session.execute('SELECT * FROM catalog WHERE course_id in \
         (SELECT course_id FROM courses WHERE campus = :val1 AND semester = :val2) AND course_id NOT IN \
         (SELECT course_id FROM completedCourses where student_id = :val3 and grade <= :val4)', \
@@ -121,9 +137,11 @@ def search_results():
 @app.route('/class-sections', methods=['GET', 'POST'])
 @login_required
 def class_sections():
+    #Checks to make sure that the current user is a student, not an advisor. 
     student = Student.query.filter_by(vip_id=current_user.vip_id).first()
     if student is None:
         return redirect(url_for('access_denied'))
+    #Need to determine the status of the student's submitted schedule to determine if student can add any more courses at the time
     status = db.session.execute('select case when count(student_vip_id) = 0 then "Not submitted" else status end as status \
         from submitted_schedules where student_vip_id = :val1 and semester = :val2', \
             {'val1': current_user.vip_id, 'val2': session['term']})
@@ -131,9 +149,12 @@ def class_sections():
     if request.method == 'POST':
         crn = request.form.get('course_crn')
         semester = request.form.get('course_semester')
+        #Student can only add classes if they have haven't yet submitted a schedule or if they advisor has responded to their proposed schedule with feedback
         if (status[0] == 'Needs review' or status[0] == 'Changes made' or status[0] == 'Advisor approved' or status[0] == 'Student signed'):
             flash('Error: You cannot add more courses at this stage.', 'danger')
         else:
+            #Ensure that the student has not already added this specific course section to their schedule.
+            #Otherwise, add the course section to the schedule
             already_added = db.session.execute('select count(1) from proposed_schedule where student_vip_id = :val1 \
             and semester = :val2 and course_crn = :val3', \
             {'val1': current_user.vip_id, 'val2': semester, 'val3': crn})
@@ -149,15 +170,18 @@ def class_sections():
     course = session['course']
     course_id = course[0 : 9]
     course = course[11:]
+    #Return all the sections that match the chosen campus, term, and course ID
     sections = db.session.execute('SELECT * FROM courses \
              WHERE campus = :val1 AND semester = :val2 AND course_id = :val3', \
             {'val1': session['campus'], 'val2': session['term'], 'val3': course_id})
+    #Return sections as a list so that it can be iterated through more than once
     return render_template('class-sections.html', sections=list(sections), course_id=course_id, course=course)
 
 
 @app.route('/completed-schedule', methods=['GET', 'POST'])
 @login_required
 def completed_schedule():
+    #Checks to make sure that the current user is a student, not an advisor. 
     student = Student.query.filter_by(vip_id=current_user.vip_id).first()
     if student is None:
         return redirect(url_for('access_denied'))
@@ -177,7 +201,9 @@ def completed_schedule():
         {'val1': session['student_vip_id'], 'val2': session['term']})
     semester = session['term']
     if request.method == 'POST':
+        #Total hours is the sum of all the credit hours of the proposed schedule
         total_hours = request.form.get('total_hours')
+        #Student is not allowed to submit the schedule until they add at least one course
         if total_hours == '0':
             flash('Error: You cannot submit a schedule with zero classes added.', 'danger')
         elif request.form['btn'] == 'Delete':
@@ -187,13 +213,17 @@ def completed_schedule():
             flash('Class has been deleted.', 'dark')
         elif request.form['btn'] == 'SUBMIT TO ADVISOR':
             schedule = submittedSchedules.query.filter_by(student_vip_id = current_user.vip_id, semester = semester).first()
+            #If the student has not yet submitted a schedule for the chosen term, add this proposed schedule to the database
             if schedule is None: 
                 new_schedule = submittedSchedules(student_vip_id = current_user.vip_id, advisor_vip_id = current_user.advisor_id, semester = semester, status = 'Needs review')
                 db.session.add(new_schedule)
                 db.session.commit()
                 flash('Your schedule has been submitted to your advisor for feedback!', 'dark')
             else:
+                #If the student has already submitted a schedule for the chosen term, check if the status is "Needs review"
                 schedule = submittedSchedules.query.filter_by(student_vip_id = current_user.vip_id, semester = semester, status='Needs review').first()
+                #If there is a submitted schedule but its status is not 'needs review' for the chosen semester, then change the status of 
+                #the submitted schedule to changes made and remove the advisor feedback and resubmit the schedule to the advisor with the changes
                 if schedule is None:
                     schedule = submittedSchedules.query.filter_by(student_vip_id = current_user.vip_id, semester = semester).first()
                     schedule.status = 'Changes made'
@@ -201,12 +231,15 @@ def completed_schedule():
                     db.session.commit()
                     flash('Your schedule has been submitted to your advisor for feedback!', 'dark')
                 else:
+                    #Student is not allowed to submit a schedule a second time until the advisor provides feedback
                     flash('Error: You cannot submit your schedule again until your advisor provides feedback.', 'danger')
         elif request.form['btn'] == 'Sign':
             signature = request.form.get('student-signature')
+            #Student is now allowed to submit a blank signature 
             if signature == '':
                 flash('Error: You must sign your name.', 'danger')
             else:
+                #When the student signs to approve the schedule, change the status of the submitted schedule to 'Student signed'
                 schedule = submittedSchedules.query.filter_by(student_vip_id=current_user.vip_id, semester=session['term']).first()
                 schedule.student_signed = 'Yes'
                 schedule.status = 'Student signed'
@@ -216,9 +249,12 @@ def completed_schedule():
     return render_template('completed-schedule.html', classes=list(classes), hours=hours.first(), semester=session['term'], status=status.first(), feedback=feedback.first())
 
 
+#This route is almost identical to the route above. This page was created because we don't want the user to see any animation 
+#if they select to review their schedule from the navigation bar.
 @app.route('/review-schedule', methods=['GET', 'POST'])
 @login_required
 def review_schedule_student():
+    #Checks to make sure that the current user is a student, not an advisor. 
     student = Student.query.filter_by(vip_id=current_user.vip_id).first()
     if student is None:
         return redirect(url_for('access_denied'))
@@ -281,6 +317,7 @@ def review_schedule_student():
 @app.route('/advisor-info', methods=['GET', 'POST'])
 @login_required
 def advisor_info():
+    #Checks to make sure that the current user is a student, not an advisor. 
     student = Student.query.filter_by(vip_id=current_user.vip_id).first()
     if student is None:
         return redirect(url_for('access_denied'))
@@ -295,6 +332,7 @@ def advisor_info():
 @app.route('/approve-schedules', methods=['GET', 'POST'])
 @login_required
 def approve_schedules():
+    #Checks to make sure that the current user is an advisor, not a student. 
     advisor = Advisor.query.filter_by(vip_id=current_user.vip_id).first()
     if advisor is None:
         return redirect(url_for('access_denied'))
@@ -312,6 +350,7 @@ def approve_schedules():
 @app.route('/review-schedule-advisor-view', methods=['GET', 'POST'])
 @login_required
 def review_schedule_advisor():
+    #Checks to make sure that the current user is an advisor, not a student.
     advisor = Advisor.query.filter_by(vip_id=current_user.vip_id).first()
     if advisor is None:
         return redirect(url_for('access_denied'))
