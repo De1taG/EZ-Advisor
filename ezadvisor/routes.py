@@ -7,6 +7,9 @@ from ezadvisor.data import Student, Advisor, Campus, Semester, Major, Courses, C
 from werkzeug.urls import url_parse
 from datetime import datetime
 
+
+#Route for index.html
+#This page contains the login form for the system
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 #GET and POST methods are for getting information from the web browser and posting info to the server
@@ -31,11 +34,16 @@ def login():
         return redirect(next_page)
     return render_template('index.html', title='Login', form=form)
 
+
+#Route for logging out of the system using the Logout link in the navigation bar
+#User is redirected to index.html
 @app.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('login'))
 
+
+#Route for get-started.html
 @app.route('/get-started', methods=['GET', 'POST'])
 @login_required
 def get_started():
@@ -49,6 +57,8 @@ def get_started():
             return redirect(url_for('build_schedule'))
     return render_template('get-started.html')
 
+
+#Route for access-denied.html
 @app.route('/access-denied')
 @login_required
 def access_denied():
@@ -59,6 +69,9 @@ def access_denied():
 
 ############# Student pages ##############
 
+
+#Route for build-schedule.html
+#This page just contains a button that allows them to initiate building a schedule
 @app.route('/build-schedule')
 @login_required
 def build_schedule():
@@ -69,6 +82,8 @@ def build_schedule():
     return render_template('build-schedule.html')
 
 
+#Route for select-campus.html
+#This page contains a form of USC campuses displayed as a list of clickable buttons
 @app.route('/select-campus', methods=['GET', 'POST'])
 @login_required
 def select_campus():
@@ -84,6 +99,8 @@ def select_campus():
     return render_template('select-campus.html', campuses=campuses)
     
 
+#Route for select-term.html
+#This page contains a form of the next semester and the following semester displayed as a list of clickable buttons
 @app.route('/select-term', methods=['GET', 'POST'])
 @login_required
 def select_term():
@@ -99,6 +116,8 @@ def select_term():
     return render_template('select-term.html', terms=terms)
 
 
+#Route for select-subject.html
+#This page contains a form of the subjects offered at the campus displayed as a list of clickable buttons
 @app.route('/select-subject', methods=['GET', 'POST'])
 @login_required
 def select_subject():
@@ -114,6 +133,8 @@ def select_subject():
     return render_template('select-subject.html', subject=subject)
 
 
+#Route for search-results.html
+#This page contains a form of the different classes for the chosen subject displayed as a list of clickable buttons
 @app.route('/search-results', methods=['GET', 'POST'])
 @login_required
 def search_results():
@@ -134,6 +155,8 @@ def search_results():
     return render_template('search-results.html', courses=courses)
 
 
+#Route for class-sections.html
+#This page contains a form of the different class sections for the chosen course displayed as a list of clickable buttons
 @app.route('/class-sections', methods=['GET', 'POST'])
 @login_required
 def class_sections():
@@ -154,11 +177,11 @@ def class_sections():
             flash('Error: You cannot add more courses at this stage.', 'danger')
         else:
             #Ensure that the student has not already added this specific course section to their schedule.
-            #Otherwise, add the course section to the schedule
             already_added = db.session.execute('select count(1) from proposed_schedule where student_vip_id = :val1 \
             and semester = :val2 and course_crn = :val3', \
             {'val1': current_user.vip_id, 'val2': semester, 'val3': crn})
             already_added = proposedSchedule.query.filter_by(student_vip_id = current_user.vip_id, semester = semester, course_crn = crn).first()
+            #Otherwise, add the course section to the schedule
             if already_added is None:
                 new_course = proposedSchedule(student_vip_id = current_user.vip_id, course_crn = crn, semester=semester)
                 db.session.add(new_course)
@@ -178,6 +201,8 @@ def class_sections():
     return render_template('class-sections.html', sections=list(sections), course_id=course_id, course=course)
 
 
+#Route for completed-schedule.html
+#This page contains a message for the user and then displays the student's proposed schedule
 @app.route('/completed-schedule', methods=['GET', 'POST'])
 @login_required
 def completed_schedule():
@@ -249,7 +274,8 @@ def completed_schedule():
     return render_template('completed-schedule.html', classes=list(classes), hours=hours.first(), semester=session['term'], status=status.first(), feedback=feedback.first())
 
 
-#This route is almost identical to the route above. This page was created because we don't want the user to see any animation 
+#This route is almost identical to the route above, but it is for review-schedule.html. 
+#This page was created because we don't want the user to see any animation 
 #if they select to review their schedule from the navigation bar.
 @app.route('/review-schedule', methods=['GET', 'POST'])
 @login_required
@@ -314,6 +340,9 @@ def review_schedule_student():
     return render_template('review-schedule.html', classes=list(classes), hours=hours.first(), semester=session['term'], status=status.first(), feedback=feedback.first())
 
 
+#Route for advisor-info.html
+#Student is directed to this page if they select Advisor Information in the navigation menu
+#This page contains information about the student's advisor
 @app.route('/advisor-info', methods=['GET', 'POST'])
 @login_required
 def advisor_info():
@@ -326,9 +355,11 @@ def advisor_info():
 
 
 
-
 ############# Advisor pages ##############
 
+
+#Route for approve-schedules.html
+#This page contains a list of all of the students of the advisor who is logged in who have submitted a proposed schedule
 @app.route('/approve-schedules', methods=['GET', 'POST'])
 @login_required
 def approve_schedules():
@@ -347,6 +378,9 @@ def approve_schedules():
         return redirect(url_for('review_schedule_advisor'))
     return render_template('approve-schedules.html', schedules=schedules)
 
+
+#Route for review-schedule-advisor-view.html
+#This page displays the student's proposed schedule and allows the advisor to approve the schedule or deny the schedule and provide feedback.
 @app.route('/review-schedule-advisor-view', methods=['GET', 'POST'])
 @login_required
 def review_schedule_advisor():

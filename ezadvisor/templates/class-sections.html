@@ -61,9 +61,11 @@
             </div>
             <div class="row">
               <div class="col">
+                <!--Display the course ID and the course name in the header of the page-->
                 <h1 id="select-class-section-header" class="page-header">{{ course_id }}<br>{{ course }}</h1>
               </div>
             </div>
+            <!--Display the chosen semester at the top of the page-->
             {{ term }}
             <div class="row">
               <div class="col">
@@ -84,23 +86,30 @@
             </div>
             <div class="row class-section-row">
               <div class="col">
+                <!--Prints a new button for each class section that is returned from the Python Flask query-->
                 {% for i in sections %}
                 <!--Open the class information modal when they select a course section-->
                 <button type="button" class="btn btn-block select-class-section-button" data-toggle="modal" data-target="#classInfoModal{{ i.crn }}">
+                  <!--The following information is dynamic and I'm using Jinja2 syntax to display the information from the database-->
                   <div class="row">
                     <div class="col">
+                      <!--Course CRN number-->
                       {{i['crn']}} 
                     </div>
                     <div class="col">
+                      <!--Course section number-->
                       {{i['section_num']}}
                     </div>
                     <div class="col">
+                      <!--Course professor-->
                       {{i['professor_name']}}
                     </div>
                     <div class="col">
+                      <!--Days of the week that the class meets-->
                       {{i['day']}}
                     </div>
                     <div class="col">
+                      <!--The start time and end time of the class-->
                       {{i['start_time']}} - {{i['end_time']}}
                     </div>
                   </div>
@@ -122,6 +131,7 @@
           <div id="class-sections-modal-content" class="modal-content">
             <form action="#" method="POST" role="form" id="addCourseForm">
               <div id="class-sections-modal-body" class="modal-body">
+                <!--The following information is dynamic and I'm using Jinja2 syntax to display the information from the database-->
                 <p id="class-sections-modal-text">
                   Course: {{ section.course_id }}<br>
                   Title: {{ section.course_title }}<br>
@@ -135,6 +145,7 @@
                   Time: {{ section.start_time }} - {{ section.end_time }}<br>
                 </p>
               </div>
+              <!--Submit the chosen class section to the database on the server when the student selects the ADD button-->
               <div id="class-sections-modal-footer" class="modal-footer">
                 <input type="submit" id="class-info-modal-button-add" class="btn class-sections-modal-button" value="ADD">
                 <button type="button" id="class-info-modal-button-cancel" class="btn class-sections-modal-button" data-dismiss="modal">CANCEL</button>
