@@ -223,7 +223,7 @@ def completed_schedule():
             {'val1': current_user.vip_id, 'val2': session['term']})
     feedback = db.session.execute('SELECT (case when advisor_feedback is null then "No feedback" else advisor_feedback end) \
         as advisor_feedback FROM submitted_schedules where student_vip_id = :val1 and semester= :val2', \
-        {'val1': session['student_vip_id'], 'val2': session['term']})
+        {'val1': current_user.vip_id, 'val2': session['term']})
     semester = session['term']
     if request.method == 'POST':
         #Total hours is the sum of all the credit hours of the proposed schedule
@@ -298,7 +298,7 @@ def review_schedule_student():
             {'val1': current_user.vip_id, 'val2': session['term']})
     feedback = db.session.execute('SELECT (case when advisor_feedback is null then "No feedback" else advisor_feedback end) \
         as advisor_feedback FROM submitted_schedules where student_vip_id = :val1 and semester= :val2', \
-        {'val1': session['student_vip_id'], 'val2': session['term']})
+        {'val1': current_user.vip_id, 'val2': session['term']})
     semester = session['term']
     if request.method == 'POST':
         total_hours = request.form.get('total_hours')
