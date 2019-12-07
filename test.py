@@ -1,6 +1,8 @@
-from ezadvisor import app
+from ezadvisor import app, db
+from ezadvisor.data import Student, Advisor
 import unittest
 from flask_testing import TestCase
+from flask_login import current_user
 
 class EZAdvisorTest(unittest.TestCase):
 
@@ -17,9 +19,12 @@ class EZAdvisorTest(unittest.TestCase):
     #and responses.
 
     def setUp(self):
+        #change app into its test state
         app.config['TESTING'] = True
         app.config['WTF_CSRF_ENABLED'] = False
-
+        #making a connection to primary database is safe for now because Test Suite is only reading
+        #from it.
+        
     # Ensure that Flask app loads correctly with a successful response
     def test_index(self):
         tester = app.test_client(self)
@@ -51,31 +56,71 @@ class EZAdvisorTest(unittest.TestCase):
         response = tester.get('/logout', follow_redirects= True)
         self.assertIn(b'Password', response.data)
 
-    #Ensure the main page required login
+    #Ensure the main page requires login
     def test_main_route_requires_login(self):
         tester = app.test_client(self)
         response = tester.get('/get-started', follow_redirects= True)
         self.assertTrue(b'Please log in to access this page.' in response.data)
 
-    #Ensure that getstarted redirects to choose classes
-    def test_get_started(self):
+    #Ensure that students are directed to choose classes
+    
+    ##### THIS TEST IS THROWING AN ASSERTION ERROR #####
+    def test_build_schedules(self):
         tester = app.test_client(self)
         response = tester.post('/index', data=dict(username= '34908943', password='FisherPassword'), follow_redirects=True)
-        self.assertIn(b'schedule', response.data)
+        self.assertIn(b'STARTED', response.data)
 
-    #Ensure that the name of the of the user logged in is correct
-    # def test_id_correct(self):
-    #     tester = app.test_client(self)
-    #     response = tester.post('/index', data=dict(username= '34908943', password='FisherPassword'), follow_redirects=True)
-        
+    #Ensure that advisors are directed to approve schedules
 
-    #Ensure that the logged in user is active
-    # def test_user_loaded(self):
-    #     tester = app.test_client(self)
-    #     response = tester.post('/index', data=dict(username= '34908943', password='FisherPassword'), follow_redirects=True)
-    #     
+    #### THIS TEST IS THROWING AN ASSERTION ERROR #####
+    def test_approve_schedules(self):
+        tester = app.test_client(self)
+        response = tester.post('/index', data=dict(username= '20424585', password='DiemerPassword'), follow_redirects=True)
+        self.assertIn(b'STARTED', response.data)
+
+    #Ensure that the correct advisor is logged in and active
+    def test_advisor_name_active(self):
+        tester = app.test_client(self)
+        with tester:
+            response = tester.post('/index', data=dict(username= '20424585', password='DiemerPassword'), follow_redirects=True)
+            self.assertTrue(current_user.name == 'Nick Diemer')
+
+    #Ensure that the correct student is logged in and active
+    def test_student_name_active(self):
+        tester = app.test_client(self)
+        with tester:
+            response = tester.post('/index', data=dict(username= '34908943', password='FisherPassword'), follow_redirects=True)
+            self.assertTrue(current_user.name == 'Garrett Fisher')
+
+    #Ensure that the right attributes corresponds to the logged in student
+    def test_student_attributes(self):
+        tester = app.test_client(self)
+        with tester:
+            response = tester.post('/index', data=dict(username= '34908943', password='FisherPassword'), follow_redirects=True)
+            self.assertTrue(current_user.email == 'gfisher@email.uscupstate.edu')
+            self.assertTrue(current_user.major_title == 'Computer Science')
+            self.assertTrue(current_user.advisor_id == 20424585)
+
+    #Ensure that the right attributes corresponds to the logged in advisor
+    def test_advisor_actributes(self):
+        tester = app.test_client(self)
+        with tester:
+            response = tester.post('/index', data=dict(username= '20424585', password='DiemerPassword'), follow_redirects=True)
+            self.assertTrue(current_user.job == 'Professor')
+            self.assertTrue(current_user.department == 'Computer Science')
+            self.assertTrue(current_user.phone == '(864) 123-4567')
+            self.assertTrue(current_user.office == 'Hodge 201')
+            self.assertTrue(current_user.email == 'ndiemer@email.uscupstate.edu')
+
+    #Ensure that the system is not keeping track of the wrong logged in users
+    def test_user_name_wrong(self):
+        tester = app.test_client(self)
+        with tester:
+            response = tester.post('/index', data=dict(username= '34908943', password='FisherPassword'), follow_redirects=True)
+            self.assertFalse(current_user.name == 'Wrong_Person')
 
     def tearDown(self):
+        #return app back from its test state
         app.config['TESTING'] = False
         app.config['WTF_CSRF_ENABLED'] = True
     
