@@ -580,6 +580,10 @@ hr {
         font-size: 30px;
         margin-left: -10px
     }
+    
+    .select-term-button {
+        font-size: 35px;
+    }
 }
 
 
