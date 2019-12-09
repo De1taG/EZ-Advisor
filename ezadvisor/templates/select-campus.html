@@ -39,8 +39,6 @@
     <!--Navbar end-->
 
       <!--Select campus start-->
-      <!--This page currently contains static hard-coded campus location options.-->
-      <!--Depending on how we want to set up the tables, we may want to create a table for campus locations and make the data on this page dynamic, but this is very low priority for this project as campuses don't change very often-->
       <div class="container-fluid mb-5">
         <div class="row mt-5">
           <div class="col-9 col-sm-7 col-md-7 col-lg-7 col-xl-11 mx-auto text-center">
@@ -50,10 +48,13 @@
               </div>
             </div>
             <form action="" method="POST" role="form">
+              <!-- Use Jinja2 as the template engine for Python-->
+              <!--The slice function will split the list of campuses into two and create two rows-->
               {% for column in campuses|slice(2) %}
                   <div class="row">
                     {% for item in column %}
                       <div class="col-xl-3">
+                        <!--Create a input field button for each campus-->
                         <input type="submit" name="campus" class="btn btn-block select-campus-button" value="{{ item }}">
                       </div>
                     {% endfor %}
