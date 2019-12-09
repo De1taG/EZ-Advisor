@@ -594,7 +594,11 @@ hr {
     }
     
     #advisor-info {
-        left: -47px;
+        left: -40px;
+    }
+    
+    .select-course-button {
+        font-size: 10.5px;
     }
 }
 
