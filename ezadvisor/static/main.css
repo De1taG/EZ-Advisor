@@ -573,7 +573,7 @@ hr {
 }
 /*-------------------------------------------------------*/
 
-@media (min-width: 320px) {
+@media (max-width: 415px) {
     a#build-schedule-button {
         width: 7em;
         height: 6.2em;;
@@ -583,6 +583,18 @@ hr {
     
     .select-term-button {
         font-size: 35px;
+    }
+    
+    .select-subject-button {
+        font-size: 21px;
+    }
+    
+    .select-class-section-button {
+        font-size: 8.5px;
+    }
+    
+    #advisor-info {
+        left: -47px;
     }
 }
 
