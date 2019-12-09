@@ -368,9 +368,17 @@ def approve_schedules():
     if advisor is None:
         return redirect(url_for('access_denied'))
     schedules = db.session.execute("select student.name, substr(submitted_schedules.submit_datetime, 1, pos1-1) as submitted_date, \
-        submitted_schedules.student_vip_id, submitted_schedules.semester, submitted_schedules.status from (select *, instr(submit_datetime, ' ') as pos1 \
-        from submitted_schedules) as submitted_schedules left join student on submitted_schedules.student_vip_id = student.vip_id \
-        where advisor_vip_id = :val1", {"val1": current_user.vip_id})
+        submitted_schedules.student_vip_id, submitted_schedules.semester, submitted_schedules.status, \
+		CASE \
+        WHEN submitted_schedules.status ==  'Needs review' THEN 1 \
+        WHEN submitted_schedules.status ==  'Changes made' THEN 2 \
+        WHEN submitted_schedules.status ==  'Feedback submitted' THEN 3 \
+		WHEN submitted_schedules.status ==  'Advisor approved' THEN 4 \
+		WHEN submitted_schedules.status ==  'Student signed' THEN 5 \
+    END as priority \
+from (select *, instr(submit_datetime, ' ') as pos1 from submitted_schedules) as submitted_schedules \
+left join student on submitted_schedules.student_vip_id = student.vip_id \
+where advisor_vip_id = :val1 order by priority", {"val1": current_user.vip_id})
     if request.method == 'POST':
         session['student_vip_id'] = request.form.get('view_schedule_vip_id')
         session['semester'] = request.form.get('view_schedule_semester')
